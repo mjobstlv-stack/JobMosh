@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
   InputGroup,
@@ -28,8 +27,13 @@ export function JobAlertsWidget() {
   }
 
   return (
-    <Card className="overflow-hidden border-primary/20 bg-primary p-6 text-primary-foreground sm:p-8">
-      <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary p-6 text-primary-foreground shadow-md sm:p-8">
+      {/* Decorative glow blob */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-10 -start-10 h-48 w-48 rounded-full bg-primary-foreground/8 blur-2xl"
+      />
+      <div className="relative flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-4">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-foreground/15">
             <BellRing className="size-6" />
@@ -38,7 +42,7 @@ export function JobAlertsWidget() {
             <h3 className="font-heading text-lg font-bold">
               לא לפספס אף משרה
             </h3>
-            <p className="mt-1 text-sm text-primary-foreground/80">
+            <p className="mt-1 text-sm text-primary-foreground/75">
               הירשמו והתראות על משרות חדשות יגיעו ישירות למייל שלכם
             </p>
           </div>
@@ -64,13 +68,13 @@ export function JobAlertsWidget() {
           <Button
             type="submit"
             variant="secondary"
-            className="shrink-0"
+            className="h-11 shrink-0"
           >
             <Send data-icon="inline-start" />
             הרשמה
           </Button>
         </form>
       </div>
-    </Card>
+    </div>
   )
 }
