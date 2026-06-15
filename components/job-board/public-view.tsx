@@ -85,14 +85,14 @@ export function PublicView({
   return (
     <div className="pb-28">
       {/* Top bar */}
-      <header className="border-b border-border bg-card/60 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+      <header className="sticky top-0 z-30 border-b border-border bg-card/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Briefcase className="size-5" />
             </span>
             <span className="font-heading text-lg font-bold text-foreground">
-              דרושים<span className="text-primary">פלוס</span>
+              ג'וב<span className="text-primary">מוש</span>
             </span>
           </div>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground sm:flex">
@@ -104,9 +104,18 @@ export function PublicView({
       </header>
 
       {/* Hero & search */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-accent/40 to-background">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
+      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-accent/50 via-accent/20 to-background">
+        {/* Decorative background glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-96 w-96 rounded-full bg-primary/8 blur-3xl"
+        />
+        <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
+              <span className="size-1.5 rounded-full bg-primary" />
+              אלפי משרות מחברות מובילות בישראל
+            </div>
             <h1 className="text-balance font-heading text-3xl font-extrabold leading-tight text-foreground sm:text-5xl">
               המשרה הבאה שלכם <span className="text-primary">מתחילה כאן</span>
             </h1>
