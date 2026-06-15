@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Sheet,
   SheetContent,
@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { JobTags } from "@/components/job-board/job-tags"
 import { ApplyFormDialog } from "@/components/job-board/apply-form-dialog"
 import { getCategoryIcon } from "@/lib/category-icons"
+import { cn } from "@/lib/utils"
 import {
   formatHebrewDate,
   type Application,
@@ -29,6 +29,19 @@ import {
   Send,
 } from "lucide-react"
 
+/** Returns true when the viewport is narrower than Tailwind's `sm` breakpoint (640px). SSR-safe: starts false. */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)")
+    setIsMobile(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    mq.addEventListener("change", handler)
+    return () => mq.removeEventListener("change", handler)
+  }, [])
+  return isMobile
+}
+
 export function JobDrawer({
   job,
   categories,
@@ -41,6 +54,7 @@ export function JobDrawer({
   onSubmitApplication: (app: Application) => void
 }) {
   const [applyOpen, setApplyOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   function handleWhatsApp() {
     if (!job) return
@@ -57,14 +71,24 @@ export function JobDrawer({
     <>
       <Sheet open={!!job} onOpenChange={onOpenChange}>
         <SheetContent
-          side="left"
-          className="w-full gap-0 p-0 sm:max-w-lg"
+          side={isMobile ? "bottom" : "left"}
+          className={cn(
+            "gap-0 p-0 flex flex-col",
+            isMobile
+              ? "w-full rounded-t-3xl max-h-[92dvh]"
+              : "sm:max-w-lg",
+          )}
         >
           {job && (
             <>
-              <SheetHeader className="border-b border-border p-6">
+              {/* Drag handle — visible on mobile only */}
+              {isMobile && (
+                <div className="mx-auto mt-3 mb-1 h-1 w-10 shrink-0 rounded-full bg-muted-foreground/30" />
+              )}
+
+              <SheetHeader className="border-b border-border p-5 shrink-0">
                 <div className="flex items-start gap-4">
-                  <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
                     {(() => {
                       const Icon = getCategoryIcon(
                         jobCats[0]?.icon ?? "briefcase",
@@ -87,8 +111,8 @@ export function JobDrawer({
                 </div>
               </SheetHeader>
 
-              <ScrollArea className="flex-1">
-                <div className="flex flex-col gap-6 p-6">
+              <ScrollArea className="flex-1 min-h-0">
+                <div className="flex flex-col gap-6 p-5">
                   <section>
                     <h3 className="font-heading text-sm font-semibold text-foreground">
                       תיאור המשרה
@@ -136,39 +160,34 @@ export function JobDrawer({
                 </div>
               </ScrollArea>
 
-              {/* Application channels */}
-              <div className="border-t border-border bg-card p-6">
+              {/* Sticky apply bar — always visible at bottom, thumb-reachable */}
+              <div className="sticky bottom-0 shrink-0 border-t border-border bg-card/95 backdrop-blur-sm p-4 z-10">
                 {job.allowSiteApply || job.allowWhatsApp ? (
-                  <>
-                    <h3 className="mb-3 font-heading text-sm font-semibold text-foreground">
-                      ערוצי הגשת מועמדות
-                    </h3>
-                    <div className="flex flex-col gap-2">
-                      {job.allowSiteApply && (
-                        <Button
-                          className="w-full"
-                          size="lg"
-                          onClick={() => setApplyOpen(true)}
-                        >
-                          <Send data-icon="inline-start" />
-                          הגש מועמדות באתר
-                        </Button>
-                      )}
-                      {job.allowWhatsApp && (
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={handleWhatsApp}
-                          className="w-full border-whatsapp/30 bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 hover:text-whatsapp-foreground"
-                        >
-                          <MessageCircle data-icon="inline-start" />
-                          הגשה מהירה בוואטסאפ
-                        </Button>
-                      )}
-                    </div>
-                  </>
+                  <div className="flex flex-col gap-2">
+                    {job.allowSiteApply && (
+                      <Button
+                        className="h-12 w-full"
+                        size="lg"
+                        onClick={() => setApplyOpen(true)}
+                      >
+                        <Send data-icon="inline-start" />
+                        הגש מועמדות באתר
+                      </Button>
+                    )}
+                    {job.allowWhatsApp && (
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={handleWhatsApp}
+                        className="h-12 w-full border-whatsapp/30 bg-whatsapp text-whatsapp-foreground hover:bg-whatsapp/90 hover:text-whatsapp-foreground"
+                      >
+                        <MessageCircle data-icon="inline-start" />
+                        הגשה מהירה בוואטסאפ
+                      </Button>
+                    )}
+                  </div>
                 ) : (
-                  <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
                     <FileText className="size-4" />
                     הגשת מועמדות לתפקיד זה אינה זמינה כרגע.
                   </div>
