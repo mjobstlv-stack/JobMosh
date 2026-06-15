@@ -29,10 +29,10 @@ export function JobCard({
           onClick()
         }
       }}
-      className="group cursor-pointer gap-0 p-5 transition-all hover:border-primary/40 hover:shadow-md focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none"
+      className="group cursor-pointer gap-0 rounded-2xl p-5 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-md hover:scale-[1.01] focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/40 focus-visible:outline-none"
     >
       <div className="flex items-start gap-4">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-colors duration-300 group-hover:bg-primary/10">
           <Icon className="size-6" />
         </div>
         <div className="min-w-0 flex-1">
@@ -43,7 +43,7 @@ export function JobCard({
             {job.company} · {job.city}
           </p>
         </div>
-        <ChevronLeft className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-x-1 group-hover:text-primary" />
+        <ChevronLeft className="size-5 shrink-0 text-muted-foreground/60 transition-all duration-300 group-hover:-translate-x-1 group-hover:text-primary" />
       </div>
 
       <div className="mt-4">
@@ -54,7 +54,7 @@ export function JobCard({
         {job.description}
       </p>
 
-      <p className="mt-4 text-xs text-muted-foreground">
+      <p className="mt-4 text-xs text-muted-foreground/70">
         פורסם ב{formatHebrewDate(job.postedAt)}
       </p>
     </Card>
