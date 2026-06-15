@@ -39,7 +39,11 @@ export function CategoryGrid({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {/*
+        Mobile: horizontal scroll carousel (flex, overflow-x-auto, snap).
+        Desktop (sm+): reverts to CSS grid via sm: overrides.
+      */}
+      <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 lg:grid-cols-4 xl:grid-cols-5">
         <CategoryCard
           label="כל המשרות"
           count={activeTotal}
@@ -84,16 +88,20 @@ function CategoryCard({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "flex flex-col items-start gap-3 rounded-2xl border p-4 text-right transition-all",
+        "flex flex-col items-start gap-3 rounded-2xl border p-4 text-right transition-all duration-300",
+        "snap-start shrink-0 w-[140px] min-h-[120px]",
+        "sm:w-auto sm:shrink",
         active
           ? "border-primary bg-primary text-primary-foreground shadow-md"
-          : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm",
+          : "border-border bg-card text-foreground hover:border-primary/30 hover:shadow-md hover:scale-[1.02]",
       )}
     >
       <span
         className={cn(
           "flex size-12 items-center justify-center rounded-xl transition-colors",
-          active ? "bg-primary-foreground/15" : "bg-accent text-accent-foreground",
+          active
+            ? "bg-primary-foreground/15"
+            : "bg-accent text-accent-foreground",
         )}
       >
         {icon}
