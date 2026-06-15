@@ -9,7 +9,7 @@ import {
   InboxIcon,
   SettingsIcon,
   TrendingUpIcon,
-  EyeIcon,
+  Pencil,
 } from "lucide-react"
 import { JobsTab } from "@/components/job-board/admin/jobs-tab"
 import { CategoriesTab } from "@/components/job-board/admin/categories-tab"
@@ -38,12 +38,12 @@ export function AdminView({
 }: Props) {
   const stats = useMemo(() => {
     const activeJobs = jobs.filter((j) => j.status === "active").length
-    const totalViews = jobs.reduce((sum, j) => sum + j.views, 0)
+    const draftJobs = jobs.filter((j) => j.status === "draft").length
     return [
       { label: "משרות פעילות", value: activeJobs, icon: BriefcaseIcon },
       { label: "קטגוריות", value: categories.length, icon: LayoutGridIcon },
       { label: "פניות שהתקבלו", value: applications.length, icon: InboxIcon },
-      { label: "צפיות במשרות", value: totalViews.toLocaleString("he-IL"), icon: EyeIcon },
+      { label: "טיוטות", value: draftJobs, icon: Pencil },
     ]
   }, [jobs, categories, applications])
 
@@ -60,9 +60,9 @@ export function AdminView({
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.label}>
+          <Card key={stat.label} className="rounded-2xl shadow-sm">
             <CardContent className="flex items-center gap-4 p-4">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
                 <stat.icon className="size-5" />
               </div>
               <div className="min-w-0">
@@ -98,10 +98,15 @@ export function AdminView({
           <JobsTab jobs={jobs} setJobs={setJobs} categories={categories} />
         </TabsContent>
         <TabsContent value="categories">
-          <CategoriesTab categories={categories} setCategories={setCategories} jobs={jobs} />
+          <CategoriesTab
+            categories={categories}
+            setCategories={setCategories}
+            jobs={jobs}
+            setJobs={setJobs}
+          />
         </TabsContent>
         <TabsContent value="applications">
-          <ApplicationsTab applications={applications} jobs={jobs} />
+          <ApplicationsTab applications={applications} />
         </TabsContent>
         <TabsContent value="settings">
           <SettingsTab settings={settings} setSettings={setSettings} />
