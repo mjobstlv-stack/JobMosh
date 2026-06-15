@@ -71,7 +71,7 @@ export function JobDrawer({
     <>
       <Sheet open={!!job} onOpenChange={onOpenChange}>
         <SheetContent
-          side={isMobile ? "bottom" : "left"}
+          side={isMobile ? "bottom" : "right"}
           className={cn(
             "gap-0 p-0 flex flex-col",
             isMobile
