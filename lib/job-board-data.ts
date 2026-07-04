@@ -23,6 +23,13 @@ export type JobType = (typeof JOB_TYPES)[number]
 export type WorkModel = (typeof WORK_MODELS)[number]
 export type JobStatus = "active" | "draft" | "archived"
 
+export type SalaryPeriod = 'HOUR' | 'MONTH'
+
+export type Salary =
+  | { type: 'range';       min: number; max: number; period: SalaryPeriod }
+  | { type: 'minimum';     min: number;              period: SalaryPeriod }
+  | { type: 'undisclosed' }
+
 export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
   active: "פעילה",
   draft: "טיוטה",
@@ -51,6 +58,7 @@ export type Job = {
   allowWhatsApp: boolean
   whatsappNumber: string
   postedAt: string // ISO date
+  salary?: Salary
 }
 
 export type Application = {
@@ -138,6 +146,7 @@ export const INITIAL_JOBS: Job[] = [
     allowWhatsApp: true,
     whatsappNumber: "972541234567",
     postedAt: "2026-06-10",
+    salary: { type: 'range', min: 12000, max: 18000, period: 'MONTH' },
   },
   {
     id: "job-2",
@@ -161,6 +170,7 @@ export const INITIAL_JOBS: Job[] = [
     allowWhatsApp: false,
     whatsappNumber: "972541234567",
     postedAt: "2026-06-11",
+    salary: { type: 'minimum', min: 45, period: 'HOUR' },
   },
   {
     id: "job-3",
@@ -184,6 +194,7 @@ export const INITIAL_JOBS: Job[] = [
     allowWhatsApp: true,
     whatsappNumber: "972521234567",
     postedAt: "2026-06-09",
+    salary: { type: 'undisclosed' },
   },
   {
     id: "job-4",
@@ -207,6 +218,7 @@ export const INITIAL_JOBS: Job[] = [
     allowWhatsApp: true,
     whatsappNumber: "972531234567",
     postedAt: "2026-06-08",
+    salary: { type: 'range', min: 8000, max: 11000, period: 'MONTH' },
   },
   {
     id: "job-5",
@@ -230,6 +242,7 @@ export const INITIAL_JOBS: Job[] = [
     allowWhatsApp: true,
     whatsappNumber: "972541112233",
     postedAt: "2026-06-12",
+    salary: { type: 'minimum', min: 9500, period: 'MONTH' },
   },
   {
     id: "job-6",
