@@ -29,6 +29,7 @@ import {
   FieldError,
   FieldSet,
   FieldLegend,
+  FieldDescription,
 } from "@/components/ui/field"
 import {
   REGIONS,
@@ -41,7 +42,7 @@ import {
   type JobType,
   type WorkModel,
 } from "@/lib/job-board-data"
-import { Send, MessageCircle } from "lucide-react"
+import { Send, MessageCircle, Mail } from "lucide-react"
 
 type Draft = Omit<Job, "id" | "postedAt"> & { id?: string; postedAt?: string }
 
@@ -59,6 +60,7 @@ const EMPTY: Draft = {
   allowSiteApply: true,
   allowWhatsApp: true,
   whatsappNumber: "972541234567",
+  notificationEmail: "",
 }
 
 export function JobFormDialog({
@@ -134,6 +136,7 @@ export function JobFormDialog({
       allowSiteApply: draft.allowSiteApply,
       allowWhatsApp: draft.allowWhatsApp,
       whatsappNumber: draft.whatsappNumber,
+      notificationEmail: draft.notificationEmail?.trim() || undefined,
     }
 
     onSave(saved)
@@ -348,6 +351,26 @@ export function JobFormDialog({
                       placeholder="972541234567"
                       className="text-right"
                     />
+                  </Field>
+                )}
+                {draft.allowSiteApply && (
+                  <Field>
+                    <FieldLabel htmlFor="job-email">
+                      <Mail className="inline size-4 text-primary ml-1" />
+                      מייל לקבלת פניות מהאתר
+                    </FieldLabel>
+                    <Input
+                      id="job-email"
+                      type="email"
+                      dir="ltr"
+                      value={draft.notificationEmail ?? ""}
+                      onChange={(e) => set("notificationEmail", e.target.value)}
+                      placeholder="employer@company.com"
+                      className="text-right"
+                    />
+                    <FieldDescription>
+                      השאר ריק לשימוש במייל ברירת המחדל של המערכת
+                    </FieldDescription>
                   </Field>
                 )}
               </div>
