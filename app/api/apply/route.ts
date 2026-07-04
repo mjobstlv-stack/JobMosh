@@ -1,10 +1,14 @@
-export const runtime = "nodejs"
-
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 
+export const runtime = "nodejs"
+
 const resend = new Resend(process.env.RESEND_API_KEY)
 const MAX_FILE_BYTES = 5 * 1024 * 1024 // 5MB
+
+function escHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,10 +51,10 @@ export async function POST(req: NextRequest) {
       <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px;">
         <h2 style="color: #163300;">ג'וב מוש — פנייה חדשה</h2>
         <table style="width:100%; border-collapse: collapse;">
-          <tr><td style="padding: 6px 0; color: #666;">משרה</td><td style="padding: 6px 0;"><strong>${jobTitle}</strong> · ${jobCompany}</td></tr>
-          <tr><td style="padding: 6px 0; color: #666;">מועמד</td><td style="padding: 6px 0;">${name}</td></tr>
-          <tr><td style="padding: 6px 0; color: #666;">טלפון</td><td style="padding: 6px 0;" dir="ltr">${phone}</td></tr>
-          <tr><td style="padding: 6px 0; color: #666;">הודעה</td><td style="padding: 6px 0;">${message || "—"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #666;">משרה</td><td style="padding: 6px 0;"><strong>${escHtml(jobTitle)}</strong> · ${escHtml(jobCompany)}</td></tr>
+          <tr><td style="padding: 6px 0; color: #666;">מועמד</td><td style="padding: 6px 0;">${escHtml(name)}</td></tr>
+          <tr><td style="padding: 6px 0; color: #666;">טלפון</td><td style="padding: 6px 0;" dir="ltr">${escHtml(phone)}</td></tr>
+          <tr><td style="padding: 6px 0; color: #666;">הודעה</td><td style="padding: 6px 0;">${message ? escHtml(message) : "—"}</td></tr>
         </table>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;" />
         <p style="color: #999; font-size: 12px;">נשלח דרך <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jobmosh.co.il"}">jobmosh.co.il</a></p>
