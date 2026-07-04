@@ -77,6 +77,23 @@ export function ApplyFormDialog({
     e.preventDefault()
     if (!validate()) return
 
+    // Read CV as data URL before sending so admin can view it later
+    let cvDataUrl: string | undefined
+    let cvFileName: string | undefined
+    if (cvFile) {
+      cvFileName = cvFile.name
+      try {
+        cvDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result as string)
+          reader.onerror = reject
+          reader.readAsDataURL(cvFile)
+        })
+      } catch {
+        // CV data URL failed — file still sent via email
+      }
+    }
+
     const formData = new FormData()
     formData.append("name", name.trim())
     formData.append("phone", phone.trim())
@@ -104,6 +121,8 @@ export function ApplyFormDialog({
         phone: phone.trim(),
         message: message.trim(),
         date: new Date().toISOString().slice(0, 10),
+        cvFileName,
+        cvDataUrl,
       })
 
       toast.success("המועמדות נשלחה בהצלחה!", {

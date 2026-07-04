@@ -1,6 +1,5 @@
 "use client"
 
-import { toast } from "sonner"
 import {
   Card,
   CardHeader,
@@ -25,31 +24,57 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty"
 import { formatHebrewDate, type Application } from "@/lib/job-board-data"
-import { FileText, Inbox } from "lucide-react"
+import { FileText, Inbox, X } from "lucide-react"
 
 export function ApplicationsTab({
   applications,
+  filterJobId,
+  filterJobTitle,
+  onClearFilter,
 }: {
   applications: Application[]
+  filterJobId?: string | null
+  filterJobTitle?: string | null
+  onClearFilter?: () => void
 }) {
+  const displayed = filterJobId
+    ? applications.filter((a) => a.jobId === filterJobId)
+    : applications
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>לוג פניות</CardTitle>
-        <CardDescription>
-          {applications.length} פניות שהתקבלו דרך הטופס באתר
-        </CardDescription>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <CardTitle>לוג פניות</CardTitle>
+            <CardDescription>
+              {filterJobId
+                ? `${displayed.length} פניות למשרת "${filterJobTitle ?? filterJobId}"`
+                : `${applications.length} פניות שהתקבלו דרך הטופס באתר`}
+            </CardDescription>
+          </div>
+          {filterJobId && onClearFilter && (
+            <Button variant="outline" size="sm" onClick={onClearFilter}>
+              <X data-icon="inline-start" />
+              הצג הכל
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
-        {applications.length === 0 ? (
+        {displayed.length === 0 ? (
           <Empty className="border py-14">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Inbox />
               </EmptyMedia>
-              <EmptyTitle>אין פניות עדיין</EmptyTitle>
+              <EmptyTitle>
+                {filterJobId ? "אין פניות למשרה זו" : "אין פניות עדיין"}
+              </EmptyTitle>
               <EmptyDescription>
-                פניות חדשות שיוגשו דרך הטופס באתר יופיעו כאן.
+                {filterJobId
+                  ? "לא הוגשו מועמדויות למשרה זו עדיין."
+                  : "פניות חדשות שיוגשו דרך הטופס באתר יופיעו כאן."}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -59,21 +84,25 @@ export function ApplicationsTab({
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-right">שם המועמד</TableHead>
-                  <TableHead className="text-right">משרה</TableHead>
+                  {!filterJobId && (
+                    <TableHead className="text-right">משרה</TableHead>
+                  )}
                   <TableHead className="text-right">טלפון</TableHead>
                   <TableHead className="text-right">תאריך</TableHead>
                   <TableHead className="text-left">קו"ח</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {applications.map((app) => (
+                {displayed.map((app) => (
                   <TableRow key={app.id}>
                     <TableCell className="font-medium text-foreground">
                       {app.name}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {app.jobTitle}
-                    </TableCell>
+                    {!filterJobId && (
+                      <TableCell className="text-muted-foreground">
+                        {app.jobTitle}
+                      </TableCell>
+                    )}
                     <TableCell dir="ltr" className="text-right text-muted-foreground">
                       {app.phone}
                     </TableCell>
@@ -81,18 +110,20 @@ export function ApplicationsTab({
                       {formatHebrewDate(app.date)}
                     </TableCell>
                     <TableCell className="text-left">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          toast.info("צפייה בקורות חיים", {
-                            description: `קובץ קורות החיים של ${app.name} (הדגמה).`,
-                          })
-                        }
-                      >
-                        <FileText data-icon="inline-start" />
-                        צפייה
-                      </Button>
+                      {app.cvDataUrl ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(app.cvDataUrl, "_blank")}
+                        >
+                          <FileText data-icon="inline-start" />
+                          צפייה
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          {app.cvFileName ? "נשלח במייל" : "—"}
+                        </span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

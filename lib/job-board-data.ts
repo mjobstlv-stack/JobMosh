@@ -70,6 +70,8 @@ export type Application = {
   phone: string
   message: string
   date: string // ISO date
+  cvFileName?: string
+  cvDataUrl?: string
 }
 
 export type GlobalSettings = {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -38,6 +38,16 @@ export function AdminView({
   settings,
   setSettings,
 }: Props) {
+  const [activeTab, setActiveTab] = useState("jobs")
+  const [filterJobId, setFilterJobId] = useState<string | null>(null)
+  const [filterJobTitle, setFilterJobTitle] = useState<string | null>(null)
+
+  function handleFilterByJob(jobId: string, jobTitle: string) {
+    setFilterJobId(jobId)
+    setFilterJobTitle(jobTitle)
+    setActiveTab("applications")
+  }
+
   const stats = useMemo(() => {
     const activeJobs = jobs.filter((j) => j.status === "active").length
     const draftJobs = jobs.filter((j) => j.status === "draft").length
@@ -76,7 +86,7 @@ export function AdminView({
         ))}
       </div>
 
-      <Tabs defaultValue="jobs">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6 flex h-auto w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="jobs">
             <BriefcaseIcon data-icon="inline-start" />
@@ -101,7 +111,13 @@ export function AdminView({
         </TabsList>
 
         <TabsContent value="jobs">
-          <JobsTab jobs={jobs} setJobs={setJobs} categories={categories} />
+          <JobsTab
+            jobs={jobs}
+            setJobs={setJobs}
+            categories={categories}
+            applications={applications}
+            onFilterByJob={handleFilterByJob}
+          />
         </TabsContent>
         <TabsContent value="categories">
           <CategoriesTab
@@ -112,7 +128,15 @@ export function AdminView({
           />
         </TabsContent>
         <TabsContent value="applications">
-          <ApplicationsTab applications={applications} />
+          <ApplicationsTab
+            applications={applications}
+            filterJobId={filterJobId}
+            filterJobTitle={filterJobTitle}
+            onClearFilter={() => {
+              setFilterJobId(null)
+              setFilterJobTitle(null)
+            }}
+          />
         </TabsContent>
         <TabsContent value="settings">
           <SettingsTab settings={settings} setSettings={setSettings} />
