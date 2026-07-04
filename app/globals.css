@@ -160,6 +160,40 @@
   }
 }
 
+/* ── Accessibility overrides (applied via JS to <html>) ───────────────── */
+html.a11y-text-lg   { font-size: 112%; }
+html.a11y-text-xl   { font-size: 125%; }
+
+html.a11y-underline-links a { text-decoration: underline !important; }
+
+html.a11y-readable-font,
+html.a11y-readable-font * { font-family: Arial, Helvetica, sans-serif !important; }
+
+html.a11y-no-animations *,
+html.a11y-no-animations *::before,
+html.a11y-no-animations *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+html.a11y-highlight-focus *:focus-visible {
+  outline: 3px solid #f59e0b !important;
+  outline-offset: 3px !important;
+  border-radius: 4px;
+}
+
+html.a11y-line-spacing p,
+html.a11y-line-spacing li,
+html.a11y-line-spacing span,
+html.a11y-line-spacing div { line-height: 1.85 !important; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

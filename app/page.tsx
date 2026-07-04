@@ -10,24 +10,38 @@ import {
   type Application,
   type GlobalSettings,
 } from "@/lib/job-board-data"
-import { RoleSwitcher, type Role } from "@/components/job-board/role-switcher"
 import { PublicView } from "@/components/job-board/public-view"
 import { AdminView } from "@/components/job-board/admin-view"
+import { LoginGate } from "@/components/job-board/login-gate"
+import { usePersistedState } from "@/hooks/use-persisted-state"
+import { UserRound } from "lucide-react"
 
 export default function Page() {
-  const [role, setRole] = useState<Role>("public")
-  const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES)
-  const [jobs, setJobs] = useState<Job[]>(INITIAL_JOBS)
-  const [applications, setApplications] =
-    useState<Application[]>(INITIAL_APPLICATIONS)
-  const [settings, setSettings] = useState<GlobalSettings>({
-    jobAlertsEnabled: true,
-  })
+  const [role, setRole] = useState<"public" | "admin">("public")
+
+  // Persisted across page refreshes via localStorage
+  const [jobs, setJobs] = usePersistedState<Job[]>("jm_jobs", INITIAL_JOBS)
+  const [categories, setCategories] = usePersistedState<Category[]>(
+    "jm_categories",
+    INITIAL_CATEGORIES,
+  )
+  const [applications, setApplications] = usePersistedState<Application[]>(
+    "jm_applications",
+    INITIAL_APPLICATIONS,
+  )
+  const [settings, setSettings] = usePersistedState<GlobalSettings>(
+    "jm_settings",
+    { jobAlertsEnabled: true },
+  )
+
+  async function handleSwitchToPublic() {
+    // Invalidate session cookie server-side
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
+    setRole("public")
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <RoleSwitcher role={role} onChange={setRole} />
-
       {role === "public" ? (
         <PublicView
           jobs={jobs}
@@ -36,17 +50,30 @@ export default function Page() {
           onSubmitApplication={(app) =>
             setApplications((prev) => [app, ...prev])
           }
+          onSwitchToAdmin={() => setRole("admin")}
         />
       ) : (
-        <AdminView
-          jobs={jobs}
-          setJobs={setJobs}
-          categories={categories}
-          setCategories={setCategories}
-          applications={applications}
-          settings={settings}
-          setSettings={setSettings}
-        />
+        <LoginGate>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleSwitchToPublic}
+              className="fixed start-4 top-4 z-50 flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:text-foreground"
+            >
+              <UserRound className="size-3.5" />
+              ממשק ציבורי
+            </button>
+            <AdminView
+              jobs={jobs}
+              setJobs={setJobs}
+              categories={categories}
+              setCategories={setCategories}
+              applications={applications}
+              settings={settings}
+              setSettings={setSettings}
+            />
+          </div>
+        </LoginGate>
       )}
     </div>
   )
