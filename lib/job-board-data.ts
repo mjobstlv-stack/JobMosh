@@ -59,6 +59,7 @@ export type Job = {
   whatsappNumber: string
   postedAt: string // ISO date
   salary?: Salary
+  notificationEmail?: string
 }
 
 export type Application = {
