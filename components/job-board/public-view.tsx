@@ -143,9 +143,9 @@ export function PublicView({
 
           {/* Main headline */}
           <h1 className="text-balance text-center text-4xl font-extrabold leading-tight text-white sm:text-6xl">
-            מצאו את הג'וב המושלם שלכם
+            מצאו את ה<span className="text-amber-400">ג'וב מוש</span>לם שלכם
             <br className="hidden sm:block" />{" "}
-            <span className="text-amber-400">במהירות</span>
+            במהירות
           </h1>
 
           <p className="mx-auto mt-5 max-w-2xl text-center text-base text-white/60 sm:text-lg">
@@ -272,8 +272,6 @@ export function PublicView({
             onSelect={setSelectedCategory}
           />
 
-          {settings.jobAlertsEnabled && <JobAlertsWidget />}
-
           <section aria-labelledby="jobs-heading">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -325,6 +323,8 @@ export function PublicView({
               </div>
             )}
           </section>
+
+          {settings.jobAlertsEnabled && <JobAlertsWidget />}
         </div>
       </main>
 

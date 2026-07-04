@@ -58,7 +58,7 @@ export default function Page() {
             <button
               type="button"
               onClick={handleSwitchToPublic}
-              className="fixed start-4 top-4 z-50 flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:text-foreground"
+              className="fixed end-4 top-4 z-50 flex items-center gap-1.5 rounded-full border border-border bg-card/90 px-3 py-1.5 text-xs text-muted-foreground shadow-sm backdrop-blur-sm transition-colors hover:text-foreground"
             >
               <UserRound className="size-3.5" />
               ממשק ציבורי
