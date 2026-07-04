@@ -143,7 +143,7 @@ export function PublicView({
 
           {/* Main headline */}
           <h1 className="text-balance text-center text-4xl font-extrabold leading-tight text-white sm:text-6xl">
-            מצא את הג'וב המושלם שלך
+            מצאו את הג'וב המושלם שלכם
             <br className="hidden sm:block" />{" "}
             <span className="text-amber-400">במהירות</span>
           </h1>
