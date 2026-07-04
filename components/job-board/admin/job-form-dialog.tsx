@@ -356,7 +356,7 @@ export function JobFormDialog({
                 {draft.allowSiteApply && (
                   <Field>
                     <FieldLabel htmlFor="job-email">
-                      <Mail className="inline size-4 text-primary ml-1" />
+                      <Mail className="inline size-4 text-primary me-1" />
                       מייל לקבלת פניות מהאתר
                     </FieldLabel>
                     <Input

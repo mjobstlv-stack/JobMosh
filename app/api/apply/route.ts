@@ -69,13 +69,18 @@ export async function POST(req: NextRequest) {
       attachments.push({ filename: cvFile.name, content: base64 })
     }
 
-    await resend.emails.send({
+    const { error: sendError } = await resend.emails.send({
       from,
       to: [recipient],
       subject,
       html,
       attachments,
     })
+
+    if (sendError) {
+      console.error("[apply] resend error:", sendError)
+      return NextResponse.json({ error: "שגיאה בשליחת המייל" }, { status: 502 })
+    }
 
     return NextResponse.json({ ok: true })
   } catch (err) {
