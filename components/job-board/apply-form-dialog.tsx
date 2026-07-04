@@ -19,7 +19,6 @@ import {
   FieldGroup,
   FieldLabel,
   FieldError,
-  FieldDescription,
   FieldContent,
 } from "@/components/ui/field"
 import { cn } from "@/lib/utils"
@@ -46,7 +45,7 @@ export function ApplyFormDialog({
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [message, setMessage] = useState("")
-  const [fileName, setFileName] = useState<string | null>(null)
+  const [cvFile, setCvFile] = useState<File | null>(null)
   const [consent, setConsent] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
 
@@ -54,7 +53,7 @@ export function ApplyFormDialog({
     setName("")
     setPhone("")
     setMessage("")
-    setFileName(null)
+    setCvFile(null)
     setConsent(false)
     setErrors({})
   }
@@ -66,28 +65,55 @@ export function ApplyFormDialog({
       next.phone = "נא להזין מספר טלפון תקין (לדוגמה 050-1234567)"
     if (!consent) next.consent = "יש לאשר את מדיניות הפרטיות כדי להמשיך"
     setErrors(next)
-    return Object.keys(next).length === 0
+    if (Object.keys(next).length !== 0) return false
+    if (cvFile && cvFile.size > 5 * 1024 * 1024) {
+      toast.error("הקובץ גדול מדי — מקסימום 5MB")
+      return false
+    }
+    return true
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
 
-    onSubmitApplication({
-      id: `app-${Date.now()}`,
-      jobId: job.id,
-      jobTitle: job.title,
-      name: name.trim(),
-      phone: phone.trim(),
-      message: message.trim(),
-      date: new Date().toISOString().slice(0, 10),
-    })
+    const formData = new FormData()
+    formData.append("name", name.trim())
+    formData.append("phone", phone.trim())
+    formData.append("message", message.trim())
+    formData.append("jobId", job.id)
+    formData.append("jobTitle", job.title)
+    formData.append("jobCompany", job.company)
+    if (job.notificationEmail) formData.append("notificationEmail", job.notificationEmail)
+    if (cvFile) formData.append("cv", cvFile)
 
-    toast.success("המועמדות נשלחה בהצלחה!", {
-      description: `הפנייה שלך למשרת "${job.title}" התקבלה. נחזור אליך בהקדם.`,
-    })
-    reset()
-    onOpenChange(false)
+    try {
+      const res = await fetch("/api/apply", { method: "POST", body: formData })
+      const data = await res.json()
+
+      if (!res.ok) {
+        toast.error(data.error ?? "שגיאה בשליחת המועמדות, נסה שנית")
+        return
+      }
+
+      onSubmitApplication({
+        id: `app-${Date.now()}`,
+        jobId: job.id,
+        jobTitle: job.title,
+        name: name.trim(),
+        phone: phone.trim(),
+        message: message.trim(),
+        date: new Date().toISOString().slice(0, 10),
+      })
+
+      toast.success("המועמדות נשלחה בהצלחה!", {
+        description: `הפנייה שלך למשרת "${job.title}" התקבלה. נחזור אליך בהקדם.`,
+      })
+      reset()
+      onOpenChange(false)
+    } catch {
+      toast.error("שגיאה בשליחת המועמדות, נסה שנית")
+    }
   }
 
   return (
@@ -152,28 +178,25 @@ export function ApplyFormDialog({
                 htmlFor="apply-cv"
                 className={cn(
                   "flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-input bg-muted/40 px-4 py-3 text-sm transition-colors hover:border-primary/50 hover:bg-accent/40",
-                  fileName && "border-primary/40 bg-accent/30",
+                  cvFile && "border-primary/40 bg-accent/30",
                 )}
               >
-                {fileName ? (
+                {cvFile ? (
                   <FileCheck2 className="size-5 text-primary" />
                 ) : (
                   <UploadCloud className="size-5 text-muted-foreground" />
                 )}
                 <span className="truncate text-foreground">
-                  {fileName ?? "בחרו קובץ PDF או Word להעלאה"}
+                  {cvFile ? cvFile.name : "בחרו קובץ PDF או Word להעלאה"}
                 </span>
                 <input
                   id="apply-cv"
                   type="file"
                   accept=".pdf,.doc,.docx"
                   className="sr-only"
-                  onChange={(e) =>
-                    setFileName(e.target.files?.[0]?.name ?? null)
-                  }
+                  onChange={(e) => setCvFile(e.target.files?.[0] ?? null)}
                 />
               </label>
-              <FieldDescription>העלאת הקובץ הינה לצורך הדגמה בלבד.</FieldDescription>
             </Field>
 
             <Field data-invalid={!!errors.consent} orientation="horizontal">
