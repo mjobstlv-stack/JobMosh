@@ -3,7 +3,6 @@ import { Resend } from "resend"
 
 export const runtime = "nodejs"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const MAX_FILE_BYTES = 5 * 1024 * 1024 // 5MB
 
 function escHtml(s: string): string {
@@ -11,6 +10,7 @@ function escHtml(s: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const form = await req.formData()
 
