@@ -52,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="he" dir="rtl" className={`${heebo.variable} bg-background`}>
+    <html lang="he" dir="rtl" className={`${heebo.variable} bg-background light`}>
       <body className="font-sans antialiased">
         {children}
         <AccessibilityMenu />
