@@ -53,7 +53,7 @@ export default function Page() {
           onSwitchToAdmin={() => setRole("admin")}
         />
       ) : (
-        <LoginGate>
+        <LoginGate onBack={() => setRole("public")}>
           <div className="relative">
             <button
               type="button"

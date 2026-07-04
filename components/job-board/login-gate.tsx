@@ -1,11 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Briefcase, Eye, EyeOff, Lock, User } from "lucide-react"
+import { Briefcase, ChevronRight, Eye, EyeOff, Lock, User } from "lucide-react"
 
 const STORAGE_KEY = "jm_auth_v1"
 
-export function LoginGate({ children }: { children: React.ReactNode }) {
+export function LoginGate({
+  children,
+  onBack,
+}: {
+  children: React.ReactNode
+  onBack?: () => void
+}) {
   const [auth, setAuth] = useState<"loading" | "ok" | "no">("loading")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -163,6 +169,17 @@ export function LoginGate({ children }: { children: React.ReactNode }) {
         <p className="mt-5 text-center text-xs text-white/25">
           גישה מוגבלת לצוות מורשה בלבד
         </p>
+
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="mt-4 flex w-full items-center justify-center gap-1.5 text-sm text-white/35 transition-colors hover:text-white/65"
+          >
+            <ChevronRight className="size-4" />
+            חזרה לאתר
+          </button>
+        )}
       </div>
     </div>
   )
