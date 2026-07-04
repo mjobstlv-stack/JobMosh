@@ -139,6 +139,7 @@ export default async function JobPage({
               ...(job.salary.type === "range"
                 ? { minValue: job.salary.min, maxValue: job.salary.max }
                 : { minValue: job.salary.min }),
+              // SalaryPeriod values ('HOUR'|'MONTH') are intentionally identical to Schema.org unitText values
               unitText: job.salary.period,
             },
           },
@@ -151,7 +152,7 @@ export default async function JobPage({
       {/* JSON-LD structured data for Google Jobs */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
 
       <div className="min-h-screen bg-background" dir="rtl">
