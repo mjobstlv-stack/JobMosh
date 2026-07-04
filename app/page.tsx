@@ -31,7 +31,15 @@ export default function Page() {
   )
   const [settings, setSettings] = usePersistedState<GlobalSettings>(
     "jm_settings",
-    { jobAlertsEnabled: true },
+    {
+      jobAlertsEnabled: true,
+      navJobsVisible: true,
+      navJobsLabel: "משרות",
+      navCompaniesVisible: false,
+      navCompaniesLabel: "חברות",
+      navCareersVisible: false,
+      navCareersLabel: "ייעוץ קריירה",
+    },
   )
 
   async function handleSwitchToPublic() {

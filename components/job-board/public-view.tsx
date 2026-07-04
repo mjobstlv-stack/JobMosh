@@ -121,15 +121,36 @@ export function PublicView({
               </span>
             </div>
             <nav className="hidden items-center gap-6 text-sm text-white/60 sm:flex">
-              <span className="cursor-pointer transition-colors hover:text-white">
-                משרות
-              </span>
-              <span className="cursor-pointer transition-colors hover:text-white">
-                חברות
-              </span>
-              <span className="cursor-pointer transition-colors hover:text-white">
-                ייעוץ קריירה
-              </span>
+              {settings.navJobsVisible && (
+                <button
+                  onClick={() =>
+                    document.getElementById("jobs-section")?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="cursor-pointer transition-colors hover:text-white"
+                >
+                  {settings.navJobsLabel || "משרות"}
+                </button>
+              )}
+              {settings.navCompaniesVisible && (
+                <button
+                  onClick={() =>
+                    document.getElementById("companies-section")?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="cursor-pointer transition-colors hover:text-white"
+                >
+                  {settings.navCompaniesLabel || "חברות"}
+                </button>
+              )}
+              {settings.navCareersVisible && (
+                <button
+                  onClick={() =>
+                    document.getElementById("careers-section")?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  className="cursor-pointer transition-colors hover:text-white"
+                >
+                  {settings.navCareersLabel || "ייעוץ קריירה"}
+                </button>
+              )}
             </nav>
           </div>
 
@@ -272,7 +293,7 @@ export function PublicView({
             onSelect={setSelectedCategory}
           />
 
-          <section aria-labelledby="jobs-heading">
+          <section id="jobs-section" aria-labelledby="jobs-heading">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2
@@ -323,6 +344,9 @@ export function PublicView({
               </div>
             )}
           </section>
+
+          <div id="companies-section" />
+          <div id="careers-section" />
 
           {settings.jobAlertsEnabled && <JobAlertsWidget />}
         </div>

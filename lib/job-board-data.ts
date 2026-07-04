@@ -74,6 +74,12 @@ export type Application = {
 
 export type GlobalSettings = {
   jobAlertsEnabled: boolean
+  navJobsVisible: boolean
+  navJobsLabel: string
+  navCompaniesVisible: boolean
+  navCompaniesLabel: string
+  navCareersVisible: boolean
+  navCareersLabel: string
 }
 
 // The set of icons the admin can pick from when creating a category.
