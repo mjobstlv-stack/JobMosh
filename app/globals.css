@@ -29,26 +29,50 @@
 }
 
 @keyframes sparkleDot {
-  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
-  50%       { opacity: 1; transform: scale(1.1) rotate(20deg); }
+  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  15%       { opacity: 0; }
+  50%       { opacity: 1; transform: scale(1.3) rotate(25deg); }
+  85%       { opacity: 0.4; transform: scale(0.7) rotate(45deg); }
 }
 
 @keyframes sparkleGlow {
-  0%, 100% { text-shadow: 0 0 0px transparent; }
-  40%       { text-shadow: 0 0 12px #fcd34d, 0 0 24px #fbbf2480; }
-  70%       { text-shadow: 0 0 6px #fde68a, 0 0 16px #fbbf2460; }
+  0%, 100% { text-shadow: none; }
+  30%       { text-shadow: 0 0 14px #fcd34d, 0 0 30px #fbbf2490, 0 0 50px #f59e0b50; }
+  60%       { text-shadow: 0 0 8px #fde68a, 0 0 20px #fbbf2460; }
+}
+
+@keyframes shimmerSweep {
+  0%   { transform: translateX(220%) skewX(-18deg); opacity: 0.8; }
+  100% { transform: translateX(-220%) skewX(-18deg); opacity: 0.8; }
 }
 
 .sparkle-dot {
   position: absolute;
   color: #fcd34d;
   pointer-events: none;
-  animation: sparkleDot 2.4s ease-in-out infinite;
+  animation: sparkleDot 2.2s ease-in-out infinite;
+  line-height: 1;
 }
 
 .sparkle-glow {
-  animation: sparkleGlow 2.4s ease-in-out infinite;
+  animation: sparkleGlow 2.2s ease-in-out infinite;
   animation-delay: 0.9s;
+}
+
+.sparkle-shimmer {
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    108deg,
+    transparent 25%,
+    rgba(255, 248, 180, 0.55) 48%,
+    rgba(255, 220, 60, 0.35) 52%,
+    transparent 75%
+  );
+  animation: shimmerSweep 2.4s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: 2px;
+  mix-blend-mode: screen;
 }
 
 @custom-variant dark (&:is(.dark *));

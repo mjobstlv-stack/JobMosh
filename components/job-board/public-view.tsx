@@ -190,10 +190,17 @@ export function PublicView({
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
               מצאו את ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span>{" "}
               <span className="whitespace-nowrap">ה<span className="relative inline-block">
+                {/* shimmer sweep */}
+                <span className="sparkle-shimmer" aria-hidden="true" />
                 <span className="hero-word-pop sparkle-glow text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם
-                <span className="sparkle-dot text-[10px]" style={{ top: "-10px", right: "2px", animationDelay: "1.0s" }}>✦</span>
-                <span className="sparkle-dot text-[8px]" style={{ top: "-4px", left: "-8px", animationDelay: "1.7s" }}>✦</span>
-                <span className="sparkle-dot text-[7px]" style={{ bottom: "-6px", right: "-6px", animationDelay: "2.2s" }}>✦</span>
+                {/* sparkle particles */}
+                <span className="sparkle-dot text-[13px]" style={{ top: "-13px", right: "4px",  animationDelay: "0.8s"  }}>✦</span>
+                <span className="sparkle-dot text-[8px]"  style={{ top: "-8px",  right: "-10px", animationDelay: "1.3s"  }}>✧</span>
+                <span className="sparkle-dot text-[10px]" style={{ top: "-6px",  left: "-12px",  animationDelay: "1.9s"  }}>✦</span>
+                <span className="sparkle-dot text-[7px]"  style={{ top: "30%",   right: "-13px", animationDelay: "0.5s"  }}>⋆</span>
+                <span className="sparkle-dot text-[9px]"  style={{ bottom: "-8px", right: "8px", animationDelay: "2.1s"  }}>✦</span>
+                <span className="sparkle-dot text-[7px]"  style={{ bottom: "-5px", left: "2px",  animationDelay: "1.6s"  }}>✧</span>
+                <span className="sparkle-dot text-[11px]" style={{ bottom: "20%", left: "-14px", animationDelay: "2.6s"  }}>✦</span>
               </span> שלכם</span>
             </span>
             <br className="hidden sm:block" />{" "}
