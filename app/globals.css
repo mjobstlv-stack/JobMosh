@@ -36,9 +36,9 @@
 }
 
 @keyframes sparkleGlow {
-  0%, 100% { text-shadow: none; }
-  30%       { text-shadow: 0 0 14px #fcd34d, 0 0 30px #fbbf2490, 0 0 50px #f59e0b50; }
-  60%       { text-shadow: 0 0 8px #fde68a, 0 0 20px #fbbf2460; }
+  0%, 100% { text-shadow: 0 0 4px #fcd34d60; }
+  30%       { text-shadow: 0 0 8px #fff, 0 0 20px #fcd34d, 0 0 40px #fbbf24, 0 0 70px #f59e0b90; }
+  60%       { text-shadow: 0 0 6px #fde68a, 0 0 18px #fcd34d, 0 0 35px #fbbf2470; }
 }
 
 @keyframes shimmerSweep {

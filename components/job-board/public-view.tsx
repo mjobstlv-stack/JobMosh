@@ -190,8 +190,6 @@ export function PublicView({
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
               מצאו את ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span>{" "}
               <span className="whitespace-nowrap">ה<span className="relative inline-block">
-                {/* shimmer sweep */}
-                <span className="sparkle-shimmer" aria-hidden="true" />
                 <span className="hero-word-pop sparkle-glow text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם
                 {/* sparkle particles */}
                 <span className="sparkle-dot text-[13px]" style={{ top: "-13px", right: "4px",  animationDelay: "0.8s"  }}>✦</span>
