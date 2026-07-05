@@ -42,10 +42,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Expected array" }, { status: 400 })
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return NextResponse.json({ error: "Blob not configured" }, { status: 503 })
-  }
-
   const { blobs } = await list({ prefix: BLOB_PATH })
   await Promise.all(blobs.map((b) => del(b.url)))
 
