@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
+import { put } from "@vercel/blob"
 
 export const runtime = "nodejs"
 
@@ -62,11 +63,24 @@ export async function POST(req: NextRequest) {
     `
 
     const attachments: { filename: string; content: string }[] = []
+    let cvUrl: string | undefined
 
     if (cvFile && cvFile.size > 0) {
       const buffer = await cvFile.arrayBuffer()
       const base64 = Buffer.from(buffer).toString("base64")
       attachments.push({ filename: cvFile.name, content: base64 })
+
+      // Upload to Vercel Blob so admin can view it later
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        try {
+          const blob = await put(`cv/${Date.now()}-${cvFile.name}`, cvFile, {
+            access: "public",
+          })
+          cvUrl = blob.url
+        } catch (blobErr) {
+          console.error("[apply] blob upload failed (continuing):", blobErr)
+        }
+      }
     }
 
     const { error: sendError } = await resend.emails.send({
@@ -82,7 +96,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "שגיאה בשליחת המייל" }, { status: 502 })
     }
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, cvUrl })
   } catch (err) {
     console.error("[apply] email send error:", err)
     return NextResponse.json({ error: "שגיאה בשליחת המייל" }, { status: 500 })
