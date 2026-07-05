@@ -5,6 +5,7 @@ import {
   REGIONS,
   JOB_TYPES,
   WORK_MODELS,
+  CITY_REGION_MAP,
   type Application,
   type Category,
   type GlobalSettings,
@@ -85,12 +86,25 @@ export function PublicView({
     [categories, activeJobCategoryIds],
   )
 
+  const activeRegions = useMemo(() => {
+    const regionSet = new Set<string>()
+    jobs.filter((j) => j.status === "active").forEach((j) => {
+      if (j.region) regionSet.add(j.region)
+      const cityRegion = j.city ? CITY_REGION_MAP[j.city.trim()] : undefined
+      if (cityRegion) regionSet.add(cityRegion)
+    })
+    return REGIONS.filter((r) => regionSet.has(r))
+  }, [jobs])
+
   const filtered = useMemo(() => {
     return jobs.filter((job) => {
       if (job.status !== "active") return false
       if (selectedCategory && !job.categoryIds.includes(selectedCategory))
         return false
-      if (region !== ALL && job.region !== region) return false
+      if (region !== ALL) {
+        const cityRegion = job.city ? CITY_REGION_MAP[job.city.trim()] : undefined
+        if (job.region !== region && cityRegion !== region) return false
+      }
       if (jobType !== ALL && job.jobType !== jobType) return false
       if (workModel !== ALL && job.workModel !== workModel) return false
       if (query.trim()) {
@@ -207,7 +221,7 @@ export function PublicView({
           {/* Main headline */}
           <h1 className="text-balance text-center text-3xl font-extrabold leading-tight text-white sm:text-5xl">
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
-              מצאו את ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span>{" "}
+              מצאו את{" "}<span className="inline-block whitespace-nowrap">ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span></span>{" "}
               <span className="inline-block whitespace-nowrap">ה<span className="relative inline-block">
                 <span className="hero-word-pop-sparkle text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם
                 {/* sparkle particles */}
@@ -262,7 +276,7 @@ export function PublicView({
 
             {/* Quick region filters */}
             <div className="mt-3 flex flex-wrap justify-center gap-2">
-              {REGIONS.slice(0, 5).map((r) => (
+              {activeRegions.map((r) => (
                 <button
                   key={r}
                   onClick={() => setRegion(region === r ? ALL : r)}

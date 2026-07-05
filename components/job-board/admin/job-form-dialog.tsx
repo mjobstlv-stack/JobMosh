@@ -35,6 +35,7 @@ import {
   REGIONS,
   JOB_TYPES,
   WORK_MODELS,
+  CITY_REGION_MAP,
   type Category,
   type Job,
   type JobStatus,
@@ -92,6 +93,13 @@ export function JobFormDialog({
       setErrors({})
     }
   }, [open, editingJob])
+
+  useEffect(() => {
+    const trimmed = draft.city?.trim() ?? ""
+    if (!trimmed) return
+    const region = CITY_REGION_MAP[trimmed]
+    if (region) setDraft((prev) => ({ ...prev, region }))
+  }, [draft.city])
 
   function set<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((prev) => ({ ...prev, [key]: value }))
