@@ -63,12 +63,24 @@ export function PublicView({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [activeJob, setActiveJob] = useState<Job | null>(null)
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
   const jobsSectionRef = useRef<HTMLElement>(null)
+  const searchRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onScroll = () => setShowBackToTop(window.scrollY > 400)
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
   const selectedCategoryName = selectedCategory
@@ -95,6 +107,27 @@ export function PublicView({
     })
     return REGIONS.filter((r) => regionSet.has(r))
   }, [jobs])
+
+  const allSuggestions = useMemo(() => {
+    const titles = new Set<string>()
+    const cities = new Set<string>()
+    jobs.filter((j) => j.status === "active").forEach((j) => {
+      if (j.title) titles.add(j.title)
+      if (j.city) cities.add(j.city)
+    })
+    return [
+      ...[...titles].map((t) => ({ label: t, type: "תפקיד" as const })),
+      ...[...cities].map((c) => ({ label: c, type: "עיר" as const })),
+    ]
+  }, [jobs])
+
+  const filteredSuggestions = useMemo(() => {
+    if (!query.trim()) return []
+    const q = query.trim().toLowerCase()
+    return allSuggestions
+      .filter((s) => s.label.toLowerCase().includes(q))
+      .slice(0, 7)
+  }, [query, allSuggestions])
 
   const filtered = useMemo(() => {
     return jobs.filter((job) => {
@@ -246,19 +279,22 @@ export function PublicView({
 
           {/* Search */}
           <div className="mx-auto mt-8 max-w-2xl">
+            <div ref={searchRef} className="relative">
             <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-2 backdrop-blur-md">
               <div className="flex min-w-0 flex-1 items-center gap-2 px-3">
                 <Search className="size-4 shrink-0 text-white/45" />
                 <input
-                  placeholder="חיפוש לפי תפקיד, חברה או עיר..."
+                  placeholder="חפש לפי תפקיד, עיר ו..."
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true) }}
+                  onFocus={() => setShowSuggestions(true)}
                   className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder-white/40 outline-none"
                   aria-label="חיפוש משרות"
+                  autoComplete="off"
                 />
                 {query && (
                   <button
-                    onClick={() => setQuery("")}
+                    onClick={() => { setQuery(""); setShowSuggestions(false) }}
                     className="shrink-0 text-white/40 transition-colors hover:text-white/70"
                     aria-label="נקה חיפוש"
                   >
@@ -272,6 +308,28 @@ export function PublicView({
               >
                 חפש משרות
               </button>
+            </div>
+
+            {/* Autocomplete dropdown */}
+            {showSuggestions && filteredSuggestions.length > 0 && (
+              <div className="absolute right-0 left-0 top-full z-50 mt-1.5 overflow-hidden rounded-xl border border-white/15 bg-primary/95 shadow-xl backdrop-blur-md">
+                {filteredSuggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      setQuery(s.label)
+                      setShowSuggestions(false)
+                      jobsSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+                    }}
+                    className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-right text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    <span>{s.label}</span>
+                    <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/50">{s.type}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             </div>
 
             {/* Quick region filters */}
