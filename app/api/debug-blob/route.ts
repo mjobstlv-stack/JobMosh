@@ -13,9 +13,17 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  // Find all BLOB-related env vars
+  const blobEnvVars = Object.entries(process.env)
+    .filter(([k]) => k.startsWith("BLOB"))
+    .reduce<Record<string, string>>((acc, [k, v]) => {
+      acc[k] = v?.slice(0, 12) + "..." ?? "null"
+      return acc
+    }, {})
+
   const result: Record<string, unknown> = {
     env_token_set: !!process.env.BLOB_READ_WRITE_TOKEN,
-    env_token_prefix: process.env.BLOB_READ_WRITE_TOKEN?.slice(0, 8) ?? null,
+    blob_env_vars: blobEnvVars,
   }
 
   // List all blobs under config/
