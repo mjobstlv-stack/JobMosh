@@ -132,7 +132,7 @@ export function ApplicationsTab({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => window.open(app.cvDataUrl, "_blank")}
+                          onClick={() => window.open(`/api/cv?url=${encodeURIComponent(app.cvDataUrl!)}`, "_blank")}
                         >
                           <FileText data-icon="inline-start" />
                           צפייה

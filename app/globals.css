@@ -33,7 +33,7 @@
   opacity: 0;
   animation:
     heroWordPop 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    sparkleGlow 8s 1.6s ease-in-out infinite;
+    sparkleGlow 5s 1.6s ease-in-out infinite;
 }
 
 @keyframes sparkleDot {
@@ -44,9 +44,8 @@
 }
 
 @keyframes sparkleGlow {
-  0%, 100% { text-shadow: 0 0 4px #fcd34d60; }
-  30%       { text-shadow: 0 0 8px #fff, 0 0 20px #fcd34d, 0 0 40px #fbbf24, 0 0 70px #f59e0b90; }
-  60%       { text-shadow: 0 0 6px #fde68a, 0 0 18px #fcd34d, 0 0 35px #fbbf2470; }
+  0%, 100% { text-shadow: none; filter: brightness(1); }
+  50%       { text-shadow: 0 0 14px #fde68a55, 0 0 28px #fbbf2435; filter: brightness(1.12); }
 }
 
 @keyframes shimmerSweep {
