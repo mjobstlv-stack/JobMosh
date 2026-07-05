@@ -98,8 +98,8 @@ export default function PrivacyPage() {
             </ul>
             <p className="mt-3 text-muted-foreground">
               לממש את זכויותיך:{" "}
-              <a href="mailto:privacy@jobmosh.co.il" className="text-primary underline">
-                privacy@jobmosh.co.il
+              <a href="mailto:mjobstlv@gmail.com" className="text-primary underline">
+                mjobstlv@gmail.com
               </a>
               . נשיב תוך 30 ימים.
             </p>
@@ -116,8 +116,8 @@ export default function PrivacyPage() {
 
           <div className="border-t border-border pt-6 text-sm text-muted-foreground">
             לפניות:{" "}
-            <a href="mailto:privacy@jobmosh.co.il" className="text-primary underline">
-              privacy@jobmosh.co.il
+            <a href="mailto:mjobstlv@gmail.com" className="text-primary underline">
+              mjobstlv@gmail.com
             </a>
           </div>
         </div>
