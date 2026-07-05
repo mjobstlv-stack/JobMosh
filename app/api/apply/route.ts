@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { put } from "@vercel/blob"
-import { kv } from "@vercel/kv"
 
 export const runtime = "nodejs"
 
@@ -97,22 +96,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "שגיאה בשליחת המייל" }, { status: 502 })
     }
 
-    // Store application server-side so admin can see all submissions
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    // Store application in Blob so admin can see all submissions from any browser
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
       try {
-        await kv.lpush("jm:applications", {
-          id: `app-${Date.now()}`,
-          jobId,
-          jobTitle,
-          name,
-          phone,
-          message,
-          date: new Date().toISOString().slice(0, 10),
-          cvFileName: cvFile?.name,
-          cvDataUrl: cvUrl,
-        })
-      } catch (kvErr) {
-        console.error("[apply] kv push failed:", kvErr)
+        const appId = `app-${Date.now()}`
+        await put(
+          `applications/${appId}.json`,
+          JSON.stringify({
+            id: appId,
+            jobId,
+            jobTitle,
+            name,
+            phone,
+            message,
+            date: new Date().toISOString().slice(0, 10),
+            cvFileName: cvFile?.name,
+            cvDataUrl: cvUrl,
+          }),
+          { access: "public", addRandomSuffix: false, contentType: "application/json" },
+        )
+      } catch (blobErr) {
+        console.error("[apply] blob application save failed:", blobErr)
       }
     }
 
