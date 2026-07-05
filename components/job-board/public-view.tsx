@@ -186,9 +186,15 @@ export function PublicView({
           </div>
 
           {/* Main headline */}
-          <h1 className="text-balance text-center text-4xl font-extrabold leading-tight text-white sm:text-6xl">
+          <h1 className="text-balance text-center text-3xl font-extrabold leading-tight text-white sm:text-5xl">
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
-              מצאו את ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span> ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם שלכם
+              מצאו את ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span>{" "}
+              <span className="whitespace-nowrap">ה<span className="relative inline-block">
+                <span className="hero-word-pop sparkle-glow text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם
+                <span className="sparkle-dot text-[10px]" style={{ top: "-10px", right: "2px", animationDelay: "1.0s" }}>✦</span>
+                <span className="sparkle-dot text-[8px]" style={{ top: "-4px", left: "-8px", animationDelay: "1.7s" }}>✦</span>
+                <span className="sparkle-dot text-[7px]" style={{ bottom: "-6px", right: "-6px", animationDelay: "2.2s" }}>✦</span>
+              </span> שלכם</span>
             </span>
             <br className="hidden sm:block" />{" "}
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.48s" }}>

@@ -27,7 +27,7 @@ import {
   type Job,
   type JobStatus,
 } from "@/lib/job-board-data"
-import { Plus, Pencil, Trash2, Send, MessageCircle, Users } from "lucide-react"
+import { Plus, Pencil, Trash2, Send, MessageCircle, Users, Copy } from "lucide-react"
 import type { Application } from "@/lib/job-board-data"
 
 const STATUS_VARIANT: Record<
@@ -65,6 +65,17 @@ export function JobsTab({
   function handleDelete(id: string) {
     setJobs((prev) => prev.filter((j) => j.id !== id))
     toast.success("המשרה נמחקה")
+  }
+
+  function handleDuplicate(job: Job) {
+    const copy: Job = {
+      ...job,
+      id: `job-${Date.now()}`,
+      title: `${job.title} (עותק)`,
+      status: "draft",
+    }
+    setJobs((prev) => [copy, ...prev])
+    toast.success("המשרה שוכפלה — נפתחה כטיוטה")
   }
 
   function toggleChannel(id: string, key: "allowSiteApply" | "allowWhatsApp") {
@@ -176,6 +187,14 @@ export function JobsTab({
                         }}
                       >
                         <Pencil />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label="שכפול"
+                        onClick={() => handleDuplicate(job)}
+                      >
+                        <Copy />
                       </Button>
                       <Button
                         variant="ghost"

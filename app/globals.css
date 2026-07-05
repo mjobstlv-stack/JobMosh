@@ -28,6 +28,29 @@
   animation: heroWordPop 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+@keyframes sparkleDot {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50%       { opacity: 1; transform: scale(1.1) rotate(20deg); }
+}
+
+@keyframes sparkleGlow {
+  0%, 100% { text-shadow: 0 0 0px transparent; }
+  40%       { text-shadow: 0 0 12px #fcd34d, 0 0 24px #fbbf2480; }
+  70%       { text-shadow: 0 0 6px #fde68a, 0 0 16px #fbbf2460; }
+}
+
+.sparkle-dot {
+  position: absolute;
+  color: #fcd34d;
+  pointer-events: none;
+  animation: sparkleDot 2.4s ease-in-out infinite;
+}
+
+.sparkle-glow {
+  animation: sparkleGlow 2.4s ease-in-out infinite;
+  animation-delay: 0.9s;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
