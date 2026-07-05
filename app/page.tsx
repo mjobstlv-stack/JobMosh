@@ -4,7 +4,6 @@ import { useState } from "react"
 import {
   INITIAL_CATEGORIES,
   INITIAL_JOBS,
-  INITIAL_APPLICATIONS,
   type Category,
   type Job,
   type Application,
@@ -25,11 +24,7 @@ export default function Page() {
     "jm_categories",
     INITIAL_CATEGORIES,
   )
-  const [applications, setApplications] = usePersistedState<Application[]>(
-    "jm_applications",
-    INITIAL_APPLICATIONS,
-  )
-  const [settings, setSettings] = usePersistedState<GlobalSettings>(
+const [settings, setSettings] = usePersistedState<GlobalSettings>(
     "jm_settings",
     {
       jobAlertsEnabled: true,
@@ -55,9 +50,7 @@ export default function Page() {
           jobs={jobs}
           categories={categories}
           settings={settings}
-          onSubmitApplication={(app) =>
-            setApplications((prev) => [app, ...prev])
-          }
+          onSubmitApplication={(_app: Application) => {}}
           onSwitchToAdmin={() => setRole("admin")}
         />
       ) : (
@@ -76,7 +69,6 @@ export default function Page() {
               setJobs={setJobs}
               categories={categories}
               setCategories={setCategories}
-              applications={applications}
               settings={settings}
               setSettings={setSettings}
             />

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { put } from "@vercel/blob"
+import { kv } from "@vercel/kv"
 
 export const runtime = "nodejs"
 
@@ -94,6 +95,25 @@ export async function POST(req: NextRequest) {
     if (sendError) {
       console.error("[apply] resend error:", sendError)
       return NextResponse.json({ error: "שגיאה בשליחת המייל" }, { status: 502 })
+    }
+
+    // Store application server-side so admin can see all submissions
+    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+      try {
+        await kv.lpush("jm:applications", {
+          id: `app-${Date.now()}`,
+          jobId,
+          jobTitle,
+          name,
+          phone,
+          message,
+          date: new Date().toISOString().slice(0, 10),
+          cvFileName: cvFile?.name,
+          cvDataUrl: cvUrl,
+        })
+      } catch (kvErr) {
+        console.error("[apply] kv push failed:", kvErr)
+      }
     }
 
     return NextResponse.json({ ok: true, cvUrl })

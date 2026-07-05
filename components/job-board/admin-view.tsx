@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -24,7 +24,6 @@ type Props = {
   setJobs: React.Dispatch<React.SetStateAction<Job[]>>
   categories: Category[]
   setCategories: React.Dispatch<React.SetStateAction<Category[]>>
-  applications: Application[]
   settings: GlobalSettings
   setSettings: React.Dispatch<React.SetStateAction<GlobalSettings>>
 }
@@ -34,13 +33,20 @@ export function AdminView({
   setJobs,
   categories,
   setCategories,
-  applications,
   settings,
   setSettings,
 }: Props) {
   const [activeTab, setActiveTab] = useState("jobs")
   const [filterJobId, setFilterJobId] = useState<string | null>(null)
   const [filterJobTitle, setFilterJobTitle] = useState<string | null>(null)
+  const [applications, setApplications] = useState<Application[]>([])
+
+  useEffect(() => {
+    fetch("/api/applications")
+      .then((r) => r.ok ? r.json() : [])
+      .then((data: Application[]) => setApplications(data))
+      .catch(() => {})
+  }, [])
 
   function handleFilterByJob(jobId: string, jobTitle: string) {
     setFilterJobId(jobId)
