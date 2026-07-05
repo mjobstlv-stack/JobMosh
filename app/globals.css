@@ -28,6 +28,14 @@
   animation: heroWordPop 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Combined: entrance pop + continuous sparkle glow after */
+.hero-word-pop-sparkle {
+  opacity: 0;
+  animation:
+    heroWordPop 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    sparkleGlow 2.2s 1.6s ease-in-out infinite;
+}
+
 @keyframes sparkleDot {
   0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
   15%       { opacity: 0; }
