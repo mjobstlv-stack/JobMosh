@@ -42,14 +42,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Expected array" }, { status: 400 })
   }
 
-  const { blobs } = await list({ prefix: BLOB_PATH })
-  await Promise.all(blobs.map((b) => del(b.url)))
+  try {
+    const { blobs } = await list({ prefix: BLOB_PATH })
+    await Promise.all(blobs.map((b) => del(b.url)))
 
-  await put(BLOB_PATH, JSON.stringify(jobs), {
-    access: "public",
-    contentType: "application/json",
-    addRandomSuffix: false,
-  })
+    await put(BLOB_PATH, JSON.stringify(jobs), {
+      access: "public",
+      contentType: "application/json",
+      addRandomSuffix: false,
+    })
 
-  return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error("[jobs] blob write failed:", message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }
