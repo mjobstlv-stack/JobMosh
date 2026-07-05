@@ -66,6 +66,17 @@ export function PublicView({
     ? categories.find((c) => c.id === selectedCategory)?.name ?? null
     : null
 
+  const activeJobCategoryIds = useMemo(() => {
+    const ids = new Set<string>()
+    jobs.filter((j) => j.status === "active").forEach((j) => j.categoryIds.forEach((id) => ids.add(id)))
+    return ids
+  }, [jobs])
+
+  const activeCategories = useMemo(
+    () => categories.filter((c) => activeJobCategoryIds.has(c.id)),
+    [categories, activeJobCategoryIds],
+  )
+
   const filtered = useMemo(() => {
     return jobs.filter((job) => {
       if (job.status !== "active") return false
@@ -264,7 +275,7 @@ export function PublicView({
           <div className="mt-10 flex justify-center gap-8 sm:gap-14">
             {[
               { n: `${activeCount}+`, label: "משרות פעילות" },
-              { n: `${categories.length}`, label: "תחומי עיסוק" },
+              { n: `${activeCategories.length}`, label: "תחומי עיסוק" },
               { n: "100%", label: "חינמי לחלוטין" },
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center text-center">
@@ -325,7 +336,7 @@ export function PublicView({
 
         <div className="flex flex-col gap-12">
           <CategoryGrid
-            categories={categories}
+            categories={activeCategories}
             jobs={jobs}
             selectedId={selectedCategory}
             onSelect={setSelectedCategory}

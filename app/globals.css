@@ -279,10 +279,12 @@ html.a11y-line-spacing div { line-height: 1.85 !important; }
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    overflow-y: scroll;
+  }
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100%;
   }
 }
