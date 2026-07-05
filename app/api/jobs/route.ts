@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { list, put, del } from "@vercel/blob"
+import { list, put, del, get } from "@vercel/blob"
 import { cookies } from "next/headers"
 import { verifySessionToken } from "@/lib/session"
 import { INITIAL_JOBS } from "@/lib/job-board-data"
@@ -11,11 +11,10 @@ const BLOB_PATH = "config/jobs.json"
 
 export async function GET() {
   try {
-    const { blobs } = await list({ prefix: BLOB_PATH })
-    if (blobs.length === 0) return NextResponse.json(INITIAL_JOBS)
-    const res = await fetch(blobs[0].downloadUrl, { cache: "no-store" })
-    if (!res.ok) return NextResponse.json(INITIAL_JOBS)
-    const data = await res.json()
+    const result = await get(BLOB_PATH, { access: "private" })
+    if (!result) return NextResponse.json(INITIAL_JOBS)
+    const text = await new Response(result.stream).text()
+    const data = JSON.parse(text)
     return NextResponse.json(Array.isArray(data) ? data : INITIAL_JOBS)
   } catch {
     return NextResponse.json(INITIAL_JOBS)

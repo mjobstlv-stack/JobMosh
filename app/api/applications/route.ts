@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { list } from "@vercel/blob"
+import { list, get } from "@vercel/blob"
 import { cookies } from "next/headers"
 import { verifySessionToken } from "@/lib/session"
 
@@ -16,11 +16,17 @@ export async function GET() {
   try {
     const { blobs } = await list({ prefix: "applications/" })
     const applications = await Promise.all(
-      blobs.map((blob) => fetch(blob.downloadUrl).then((r) => r.json())),
+      blobs.map(async (blob) => {
+        const result = await get(blob.pathname, { access: "private" })
+        if (!result) return null
+        const text = await new Response(result.stream).text()
+        return JSON.parse(text)
+      }),
     )
+    const validApplications = applications.filter(Boolean)
     // newest first
-    applications.sort((a, b) => (b.id > a.id ? 1 : -1))
-    return NextResponse.json(applications)
+    validApplications.sort((a, b) => (b.id > a.id ? 1 : -1))
+    return NextResponse.json(validApplications)
   } catch (err) {
     console.error("[applications] blob read failed:", err)
     return NextResponse.json([])

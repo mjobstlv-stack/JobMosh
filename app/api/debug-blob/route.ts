@@ -40,12 +40,26 @@ export async function GET() {
     result.list_error = err instanceof Error ? err.message : String(err)
   }
 
-  // Try fetching the jobs blob if found
-  const configBlobs = result.config_blobs as Array<{ downloadUrl: string; pathname: string }> | undefined
+  // Show VERCEL_OIDC_TOKEN presence
+  result.oidc_token_set = !!process.env.VERCEL_OIDC_TOKEN
+  result.oidc_token_prefix = process.env.VERCEL_OIDC_TOKEN?.slice(0, 12) ?? null
+  result.blob_store_id = process.env.BLOB_STORE_ID ?? null
+
+  // Try fetching the jobs blob if found — try with OIDC token as Bearer
+  const configBlobs = result.config_blobs as Array<{ url: string; downloadUrl: string; pathname: string }> | undefined
   const jobsBlob = configBlobs?.find((b) => b.pathname.startsWith("config/jobs"))
   if (jobsBlob) {
+    const oidcToken = process.env.VERCEL_OIDC_TOKEN
+    const rwToken = process.env.BLOB_READ_WRITE_TOKEN
+    const authToken = rwToken ?? oidcToken
+
+    const headers: Record<string, string> = {}
+    if (authToken) headers["Authorization"] = `Bearer ${authToken}`
+    result.auth_method = rwToken ? "BLOB_READ_WRITE_TOKEN" : oidcToken ? "VERCEL_OIDC_TOKEN" : "none"
+
     try {
-      const res = await fetch(jobsBlob.downloadUrl, { cache: "no-store" })
+      // Try blob base URL (without ?download=1)
+      const res = await fetch(jobsBlob.url, { headers, cache: "no-store" } as RequestInit)
       result.jobs_fetch_status = res.status
       result.jobs_fetch_ok = res.ok
       if (res.ok) {
