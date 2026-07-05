@@ -13,7 +13,7 @@ export async function GET() {
   try {
     const { blobs } = await list({ prefix: BLOB_PATH })
     if (blobs.length === 0) return NextResponse.json(INITIAL_JOBS)
-    const res = await fetch(blobs[0].url, { cache: "no-store" })
+    const res = await fetch(blobs[0].downloadUrl, { cache: "no-store" })
     if (!res.ok) return NextResponse.json(INITIAL_JOBS)
     const data = await res.json()
     return NextResponse.json(Array.isArray(data) ? data : INITIAL_JOBS)

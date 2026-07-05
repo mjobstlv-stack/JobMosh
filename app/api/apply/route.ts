@@ -127,16 +127,14 @@ export async function POST(req: NextRequest) {
         content: base64,
       })
 
-      if (process.env.BLOB_READ_WRITE_TOKEN) {
-        try {
-          const safeName = sanitizeFilename(cvFile.name)
-          const blob = await put(`cv/${Date.now()}-${safeName}`, cvFile, {
-            access: "public",
-          })
-          cvUrl = blob.url
-        } catch (blobErr) {
-          console.error("[apply] blob upload failed (continuing):", blobErr)
-        }
+      try {
+        const safeName = sanitizeFilename(cvFile.name)
+        const blob = await put(`cv/${Date.now()}-${safeName}`, cvFile, {
+          access: "private",
+        })
+        cvUrl = blob.downloadUrl
+      } catch (blobErr) {
+        console.error("[apply] blob upload failed (continuing):", blobErr)
       }
     }
 
@@ -154,31 +152,29 @@ export async function POST(req: NextRequest) {
     }
 
     // Store application in Blob so admin can see all submissions from any browser
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
-      try {
-        const appId = `app-${Date.now()}`
-        await put(
-          `applications/${appId}.json`,
-          JSON.stringify({
-            id: appId,
-            jobId,
-            jobTitle,
-            name,
-            phone,
-            message,
-            date: new Date().toISOString().slice(0, 10),
-            cvFileName: cvFile?.name ? sanitizeFilename(cvFile.name) : undefined,
-            cvDataUrl: cvUrl,
-          }),
-          {
-            access: "public",
-            addRandomSuffix: false,
-            contentType: "application/json",
-          },
-        )
-      } catch (blobErr) {
-        console.error("[apply] blob application save failed:", blobErr)
-      }
+    try {
+      const appId = `app-${Date.now()}`
+      await put(
+        `applications/${appId}.json`,
+        JSON.stringify({
+          id: appId,
+          jobId,
+          jobTitle,
+          name,
+          phone,
+          message,
+          date: new Date().toISOString().slice(0, 10),
+          cvFileName: cvFile?.name ? sanitizeFilename(cvFile.name) : undefined,
+          cvDataUrl: cvUrl,
+        }),
+        {
+          access: "private",
+          addRandomSuffix: false,
+          contentType: "application/json",
+        },
+      )
+    } catch (blobErr) {
+      console.error("[apply] blob application save failed:", blobErr)
     }
 
     return NextResponse.json({ ok: true, cvUrl })

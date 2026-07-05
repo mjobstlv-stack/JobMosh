@@ -13,13 +13,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return NextResponse.json([])
-  }
   try {
     const { blobs } = await list({ prefix: "applications/" })
     const applications = await Promise.all(
-      blobs.map((blob) => fetch(blob.url).then((r) => r.json())),
+      blobs.map((blob) => fetch(blob.downloadUrl).then((r) => r.json())),
     )
     // newest first
     applications.sort((a, b) => (b.id > a.id ? 1 : -1))
