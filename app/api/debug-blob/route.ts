@@ -17,7 +17,7 @@ export async function GET() {
   const blobEnvVars = Object.entries(process.env)
     .filter(([k]) => k.startsWith("BLOB"))
     .reduce<Record<string, string>>((acc, [k, v]) => {
-      acc[k] = v?.slice(0, 12) + "..." ?? "null"
+      acc[k] = v ? v.slice(0, 12) + "..." : "null"
       return acc
     }, {})
 
