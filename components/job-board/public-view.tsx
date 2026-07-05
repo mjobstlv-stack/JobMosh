@@ -208,7 +208,7 @@ export function PublicView({
           <h1 className="text-balance text-center text-3xl font-extrabold leading-tight text-white sm:text-5xl">
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
               מצאו את ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span>{" "}
-              <span className="whitespace-nowrap">ה<span className="relative inline-block">
+              <span className="inline-block whitespace-nowrap">ה<span className="relative inline-block">
                 <span className="hero-word-pop-sparkle text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם
                 {/* sparkle particles */}
                 <span className="sparkle-dot text-[13px]" style={{ top: "-13px", right: "4px",  animationDelay: "0.8s"  }}>✦</span>
@@ -218,7 +218,7 @@ export function PublicView({
                 <span className="sparkle-dot text-[9px]"  style={{ bottom: "-8px", right: "8px", animationDelay: "2.1s"  }}>✦</span>
                 <span className="sparkle-dot text-[7px]"  style={{ bottom: "-5px", left: "2px",  animationDelay: "1.6s"  }}>✧</span>
                 <span className="sparkle-dot text-[11px]" style={{ bottom: "20%", left: "-14px", animationDelay: "2.6s"  }}>✦</span>
-              </span> שלכם</span>
+              </span></span>{" "}שלכם
             </span>
             <br className="hidden sm:block" />{" "}
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.48s" }}>
