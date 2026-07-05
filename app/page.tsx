@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
   INITIAL_CATEGORIES,
   INITIAL_JOBS,
@@ -17,28 +17,60 @@ import { UserRound } from "lucide-react"
 
 export default function Page() {
   const [role, setRole] = useState<"public" | "admin">("public")
+  const [jobs, setJobsState] = useState<Job[]>(INITIAL_JOBS)
+  const [categories, setCategoriesState] = useState<Category[]>(INITIAL_CATEGORIES)
 
-  // Persisted across page refreshes via localStorage
-  const [jobs, setJobs] = usePersistedState<Job[]>("jm_jobs", INITIAL_JOBS)
-  const [categories, setCategories] = usePersistedState<Category[]>(
-    "jm_categories",
-    INITIAL_CATEGORIES,
-  )
-const [settings, setSettings] = usePersistedState<GlobalSettings>(
-    "jm_settings",
-    {
-      jobAlertsEnabled: true,
-      navJobsVisible: true,
-      navJobsLabel: "משרות",
-      navCompaniesVisible: false,
-      navCompaniesLabel: "חברות",
-      navCareersVisible: false,
-      navCareersLabel: "ייעוץ קריירה",
-    },
-  )
+  const [settings, setSettings] = usePersistedState<GlobalSettings>("jm_settings", {
+    jobAlertsEnabled: true,
+    navJobsVisible: true,
+    navJobsLabel: "משרות",
+    navCompaniesVisible: false,
+    navCompaniesLabel: "חברות",
+    navCareersVisible: false,
+    navCareersLabel: "ייעוץ קריירה",
+  })
+
+  // Load jobs + categories from Blob on every mount so all devices stay in sync
+  useEffect(() => {
+    fetch("/api/jobs")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (Array.isArray(data) && data.length > 0) setJobsState(data) })
+      .catch(() => {})
+
+    fetch("/api/categories")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (Array.isArray(data) && data.length > 0) setCategoriesState(data) })
+      .catch(() => {})
+  }, [])
+
+  // Wrapped setters: update state AND persist to Blob immediately
+  const setJobs = useCallback<React.Dispatch<React.SetStateAction<Job[]>>>((action) => {
+    setJobsState((prev) => {
+      const next = typeof action === "function" ? action(prev) : action
+      fetch("/api/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(next),
+      }).catch(console.error)
+      return next
+    })
+  }, [])
+
+  const setCategories = useCallback<React.Dispatch<React.SetStateAction<Category[]>>>((action) => {
+    setCategoriesState((prev) => {
+      const next = typeof action === "function" ? action(prev) : action
+      fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(next),
+      }).catch(console.error)
+      return next
+    })
+  }, [])
 
   async function handleSwitchToPublic() {
-    // Invalidate session cookie server-side
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
     setRole("public")
   }

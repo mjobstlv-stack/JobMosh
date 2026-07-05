@@ -100,6 +100,8 @@ export const ICON_OPTIONS = [
   "legal",
   "realestate",
   "briefcase",
+  "fashion",
+  "warehouse",
 ] as const
 
 export type IconKey = (typeof ICON_OPTIONS)[number]
@@ -119,6 +121,8 @@ export const ICON_LABELS: Record<IconKey, string> = {
   legal: "משפטים",
   realestate: "נדל\u05F4ן",
   briefcase: "כללי",
+  fashion: "אופנה",
+  warehouse: "מחסנאות",
 }
 
 export const INITIAL_CATEGORIES: Category[] = [

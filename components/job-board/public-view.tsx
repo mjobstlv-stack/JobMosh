@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   REGIONS,
   JOB_TYPES,
@@ -30,7 +30,7 @@ import { JobCard } from "@/components/job-board/job-card"
 import { JobAlertsWidget } from "@/components/job-board/job-alerts-widget"
 import { JobDrawer } from "@/components/job-board/job-drawer"
 import { cn } from "@/lib/utils"
-import { Briefcase, Search, SearchX, X } from "lucide-react"
+import { ArrowUp, Briefcase, Search, SearchX, X } from "lucide-react"
 
 const ALL = "all"
 
@@ -53,6 +53,18 @@ export function PublicView({
   const [workModel, setWorkModel] = useState<string>(ALL)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [activeJob, setActiveJob] = useState<Job | null>(null)
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const jobsSectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 400)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  const selectedCategoryName = selectedCategory
+    ? categories.find((c) => c.id === selectedCategory)?.name ?? null
+    : null
 
   const filtered = useMemo(() => {
     return jobs.filter((job) => {
@@ -112,12 +124,23 @@ export function PublicView({
         <div className="relative z-10 mx-auto max-w-6xl px-4 pt-8 pb-28 sm:pt-12 sm:pb-36">
           {/* Nav row */}
           <div className="mb-12 flex items-center justify-between sm:mb-16">
-            <div className="flex items-center gap-2.5">
-              <span className="flex size-10 items-center justify-center rounded-xl border border-white/20 bg-white/15 backdrop-blur-sm">
-                <Briefcase className="size-5 text-white" />
+            <div className="flex items-center gap-2.5 group">
+              <span className="flex size-10 items-center justify-center rounded-xl border border-white/20 bg-white/15 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/25 group-hover:scale-110 group-hover:rotate-3">
+                <Briefcase className="size-5 text-white transition-transform duration-300 group-hover:scale-110" />
               </span>
-              <span className="font-heading text-xl font-extrabold text-white">
-                ג'וב<span className="text-amber-400">מוש</span>
+              <span className="font-heading text-xl font-extrabold text-white relative">
+                <span className="inline-block animate-[fadeSlideIn_0.5s_ease_both]">ג&apos;וב</span>
+                <span
+                  className="relative inline-block text-amber-400 animate-[fadeSlideIn_0.5s_0.15s_ease_both_backwards]"
+                >
+                  מוש
+                  {/* Animated underline glow */}
+                  <span className="absolute -bottom-0.5 right-0 h-0.5 w-0 bg-amber-400/70 rounded-full transition-all duration-500 group-hover:w-full" />
+                </span>
+                {/* Sparkle that appears on hover */}
+                <span className="absolute -top-1.5 -left-2 text-[10px] opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:-translate-y-1 select-none pointer-events-none">
+                  ✦
+                </span>
               </span>
             </div>
             <nav className="hidden items-center gap-6 text-sm text-white/60 sm:flex">
@@ -158,18 +181,22 @@ export function PublicView({
           <div className="mb-5 text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs text-white/80 backdrop-blur-sm">
               <span className="size-1.5 animate-pulse rounded-full bg-amber-400" />
-              לוח הדרושים המוביל בישראל
+              לוח הדרושים המושלם בישראל
             </span>
           </div>
 
           {/* Main headline */}
           <h1 className="text-balance text-center text-4xl font-extrabold leading-tight text-white sm:text-6xl">
-            מצאו את ה<span className="text-amber-400">ג'וב מוש</span>לם שלכם
+            <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
+              מצאו את ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span> ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם שלכם
+            </span>
             <br className="hidden sm:block" />{" "}
-            במהירות
+            <span className="hero-reveal inline-block" style={{ animationDelay: "0.48s" }}>
+              במהירות
+            </span>
           </h1>
 
-          <p className="mx-auto mt-5 max-w-2xl text-center text-base text-white/60 sm:text-lg">
+          <p className="hero-reveal mx-auto mt-5 max-w-2xl text-center text-base text-white/60 sm:text-lg" style={{ animationDelay: "0.65s" }}>
             חפשו לפי תפקיד, אזור והיקף משרה ומצאו את ההזדמנות המושלמת עבורכם.
           </p>
 
@@ -196,7 +223,7 @@ export function PublicView({
                 )}
               </div>
               <button
-                onClick={() => {}}
+                onClick={() => jobsSectionRef.current?.scrollIntoView({ behavior: "smooth" })}
                 className="h-11 shrink-0 rounded-xl bg-amber-500 px-5 font-semibold text-white transition-all hover:bg-amber-400 hover:shadow-lg hover:shadow-amber-500/25 active:scale-[0.98]"
               >
                 חפש משרות
@@ -293,7 +320,7 @@ export function PublicView({
             onSelect={setSelectedCategory}
           />
 
-          <section id="jobs-section" aria-labelledby="jobs-heading">
+          <section id="jobs-section" ref={jobsSectionRef} aria-labelledby="jobs-heading">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2
@@ -322,14 +349,24 @@ export function PublicView({
                   </EmptyMedia>
                   <EmptyTitle>לא נמצאו משרות</EmptyTitle>
                   <EmptyDescription>
-                    נסו להרחיב את החיפוש או לנקות את הסינון הקיים.
+                    {selectedCategoryName
+                      ? `לא נמצאו משרות פעילות בקטגוריית "${selectedCategoryName}". נסו קטגוריה אחרת.`
+                      : "נסו להרחיב את החיפוש או לנקות את הסינון הקיים."}
                   </EmptyDescription>
                 </EmptyHeader>
-                {hasFilters && (
-                  <Button variant="outline" size="sm" onClick={resetFilters}>
-                    ניקוי כל הסינונים
-                  </Button>
-                )}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {selectedCategoryName && (
+                    <Button variant="outline" size="sm" onClick={() => setSelectedCategory(null)}>
+                      <X data-icon="inline-start" />
+                      הסר קטגוריה
+                    </Button>
+                  )}
+                  {hasFilters && (
+                    <Button variant="outline" size="sm" onClick={resetFilters}>
+                      ניקוי כל הסינונים
+                    </Button>
+                  )}
+                </div>
               </Empty>
             ) : (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -361,7 +398,10 @@ export function PublicView({
         onSubmitApplication={onSubmitApplication}
       />
 
-      <footer className="border-t border-border py-6 text-center">
+      <footer className="border-t border-border py-8 text-center">
+        <p className="mb-3 text-sm font-medium text-muted-foreground">
+          ג&apos;וב <span className="text-amber-500">מוש</span> — לוח הדרושים המושלם בישראל
+        </p>
         <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground/50">
           <a href="/terms" className="transition-colors hover:text-muted-foreground">
             תנאי שירות
@@ -376,7 +416,19 @@ export function PublicView({
             כניסת מנהל
           </button>
         </div>
+        <p className="mt-3 text-[11px] text-muted-foreground/30">© {new Date().getFullYear()} ג&apos;וב מוש. כל הזכויות שמורות.</p>
       </footer>
+
+      {/* Back to top */}
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="חזרה לראש הדף"
+          className="fixed bottom-6 start-6 z-50 flex size-11 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/20 text-primary-foreground transition-all hover:bg-primary/90 hover:scale-110 active:scale-95"
+        >
+          <ArrowUp className="size-5" />
+        </button>
+      )}
     </div>
   )
 }

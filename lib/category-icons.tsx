@@ -13,6 +13,8 @@ import {
   Scale,
   Building2,
   Briefcase,
+  Shirt,
+  Warehouse,
   type LucideIcon,
 } from "lucide-react"
 
@@ -33,6 +35,8 @@ export const ICON_REGISTRY: Record<IconKey, LucideIcon> = {
   legal: Scale,
   realestate: Building2,
   briefcase: Briefcase,
+  fashion: Shirt,
+  warehouse: Warehouse,
 }
 
 export function getCategoryIcon(icon: string): LucideIcon {
