@@ -33,7 +33,7 @@
   opacity: 0;
   animation:
     heroWordPop 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    sparkleGlow 5s 1.6s ease-in-out infinite;
+    sparkleGlow 8s 1.6s ease-in-out infinite;
 }
 
 @keyframes sparkleDot {
@@ -58,7 +58,7 @@
   position: absolute;
   color: #fcd34d;
   pointer-events: none;
-  animation: sparkleDot 4s ease-in-out infinite;
+  animation: sparkleDot 6s ease-in-out infinite;
   line-height: 1;
 }
 
