@@ -16,7 +16,10 @@ export async function GET() {
   try {
     const { blobs } = await list({ prefix: BLOB_PATH })
     if (blobs.length === 0) return NextResponse.json(INITIAL_JOBS)
-    const res = await fetch(blobs[0].url, { cache: "no-store" })
+    const res = await fetch(blobs[0].url, {
+      headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` },
+      cache: "no-store",
+    })
     if (!res.ok) return NextResponse.json(INITIAL_JOBS)
     const data = await res.json()
     return NextResponse.json(Array.isArray(data) ? data : INITIAL_JOBS)
@@ -47,7 +50,7 @@ export async function POST(req: Request) {
     await Promise.all(blobs.map((b) => del(b.url)))
 
     await put(BLOB_PATH, JSON.stringify(jobs), {
-      access: "public",
+      access: "private",
       contentType: "application/json",
       addRandomSuffix: false,
     })

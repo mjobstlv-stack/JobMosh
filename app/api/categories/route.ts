@@ -16,7 +16,10 @@ export async function GET() {
   try {
     const { blobs } = await list({ prefix: BLOB_PATH })
     if (blobs.length === 0) return NextResponse.json(INITIAL_CATEGORIES)
-    const res = await fetch(blobs[0].url, { cache: "no-store" })
+    const res = await fetch(blobs[0].url, {
+      headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` },
+      cache: "no-store",
+    })
     if (!res.ok) return NextResponse.json(INITIAL_CATEGORIES)
     const data = await res.json()
     return NextResponse.json(Array.isArray(data) ? data : INITIAL_CATEGORIES)
@@ -42,14 +45,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Expected array" }, { status: 400 })
   }
 
-  const { blobs } = await list({ prefix: BLOB_PATH })
-  await Promise.all(blobs.map((b) => del(b.url)))
+  try {
+    const { blobs } = await list({ prefix: BLOB_PATH })
+    await Promise.all(blobs.map((b) => del(b.url)))
 
-  await put(BLOB_PATH, JSON.stringify(categories), {
-    access: "public",
-    contentType: "application/json",
-    addRandomSuffix: false,
-  })
+    await put(BLOB_PATH, JSON.stringify(categories), {
+      access: "private",
+      contentType: "application/json",
+      addRandomSuffix: false,
+    })
 
-  return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error("[categories] blob write failed:", message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }
