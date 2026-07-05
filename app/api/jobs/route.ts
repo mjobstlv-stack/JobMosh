@@ -10,16 +10,10 @@ export const dynamic = "force-dynamic"
 const BLOB_PATH = "config/jobs.json"
 
 export async function GET() {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return NextResponse.json(INITIAL_JOBS)
-  }
   try {
     const { blobs } = await list({ prefix: BLOB_PATH })
     if (blobs.length === 0) return NextResponse.json(INITIAL_JOBS)
-    const res = await fetch(blobs[0].url, {
-      headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` },
-      cache: "no-store",
-    })
+    const res = await fetch(blobs[0].url, { cache: "no-store" })
     if (!res.ok) return NextResponse.json(INITIAL_JOBS)
     const data = await res.json()
     return NextResponse.json(Array.isArray(data) ? data : INITIAL_JOBS)
@@ -48,17 +42,14 @@ export async function POST(req: Request) {
   try {
     const { blobs } = await list({ prefix: BLOB_PATH })
     await Promise.all(blobs.map((b) => del(b.url)))
-
     await put(BLOB_PATH, JSON.stringify(jobs), {
       access: "private",
       contentType: "application/json",
       addRandomSuffix: false,
     })
-
     return NextResponse.json({ ok: true })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    console.error("[jobs] blob write failed:", message)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
