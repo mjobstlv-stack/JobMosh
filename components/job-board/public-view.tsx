@@ -31,6 +31,14 @@ import { JobAlertsWidget } from "@/components/job-board/job-alerts-widget"
 import { JobDrawer } from "@/components/job-board/job-drawer"
 import { cn } from "@/lib/utils"
 import { ArrowUp, Briefcase, Search, SearchX, X } from "lucide-react"
+import { FaInstagram, FaTelegram, FaFacebook } from "react-icons/fa"
+
+const SOCIAL_LINKS = [
+  { href: "https://www.instagram.com/mjobstlv?igsh=ZWNsb2o0OHBheDNz", icon: FaInstagram, label: "אינסטגרם", color: "hover:text-pink-400" },
+  { href: "https://t.me/+SqyxSwOXhjEyMWE0", icon: FaTelegram, label: "קבוצת טלגרם", color: "hover:text-sky-400" },
+  { href: "https://t.me/mjobsisrael", icon: FaTelegram, label: "ערוץ טלגרם", color: "hover:text-sky-300" },
+  { href: "https://www.facebook.com/MjobsTlv", icon: FaFacebook, label: "פייסבוק", color: "hover:text-blue-400" },
+]
 
 const ALL = "all"
 
@@ -288,6 +296,22 @@ export function PublicView({
           </div>
         </div>
 
+        {/* Social links */}
+        <div className="absolute bottom-14 sm:bottom-24 start-0 end-0 flex justify-center gap-5">
+          {SOCIAL_LINKS.map(({ href, icon: Icon, label, color }) => (
+            <a
+              key={href}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className={cn("text-white/40 transition-colors duration-200", color)}
+            >
+              <Icon size={20} />
+            </a>
+          ))}
+        </div>
+
         {/* Wave separator SVG */}
         <div className="absolute bottom-0 start-0 end-0">
           <svg
@@ -424,6 +448,20 @@ export function PublicView({
         <p className="mb-3 text-sm font-medium text-muted-foreground">
           ג&apos;וב <span className="text-amber-500">מוש</span> — לוח הדרושים המושלם בישראל
         </p>
+        <div className="mb-4 flex justify-center gap-5">
+          {SOCIAL_LINKS.map(({ href, icon: Icon, label, color }) => (
+            <a
+              key={href}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className={cn("text-muted-foreground/40 transition-colors duration-200", color)}
+            >
+              <Icon size={22} />
+            </a>
+          ))}
+        </div>
         <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground/50">
           <a href="/terms" className="transition-colors hover:text-muted-foreground">
             תנאי שירות
