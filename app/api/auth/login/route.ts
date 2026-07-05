@@ -1,7 +1,7 @@
 export const runtime = "nodejs"
 
 import { NextResponse } from "next/server"
-import { createSessionToken } from "@/lib/session"
+import { createSessionToken, safeEqual } from "@/lib/session"
 
 export async function POST(req: Request) {
   let body: { username?: string; password?: string }
@@ -17,9 +17,9 @@ export async function POST(req: Request) {
   const correctUser = process.env.ADMIN_USERNAME ?? ""
   const correctPass = process.env.ADMIN_PASSWORD ?? ""
 
-  // Both checks always run to avoid timing-based user enumeration
-  const userOk = username === correctUser
-  const passOk = password === correctPass
+  // Both checks always run (constant-time) to prevent user enumeration and timing attacks
+  const userOk = safeEqual(username, correctUser)
+  const passOk = safeEqual(password, correctPass)
 
   if (!userOk || !passOk) {
     // Fixed-time delay makes brute-force significantly slower

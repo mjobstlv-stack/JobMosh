@@ -362,12 +362,20 @@ export function PublicView({
       />
 
       <footer className="border-t border-border py-6 text-center">
-        <button
-          onClick={onSwitchToAdmin}
-          className="text-xs text-muted-foreground/30 transition-colors hover:text-muted-foreground/60"
-        >
-          כניסת מנהל
-        </button>
+        <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground/50">
+          <a href="/terms" className="transition-colors hover:text-muted-foreground">
+            תנאי שירות
+          </a>
+          <a href="/privacy" className="transition-colors hover:text-muted-foreground">
+            מדיניות פרטיות
+          </a>
+          <button
+            onClick={onSwitchToAdmin}
+            className="transition-colors hover:text-muted-foreground/80"
+          >
+            כניסת מנהל
+          </button>
+        </div>
       </footer>
     </div>
   )

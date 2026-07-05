@@ -21,6 +21,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily" as const,
       priority: 1,
     },
+    {
+      url: `${BASE_URL}/terms`,
+      lastModified: new Date("2026-07-05"),
+      changeFrequency: "yearly" as const,
+      priority: 0.2,
+    },
+    {
+      url: `${BASE_URL}/privacy`,
+      lastModified: new Date("2026-07-05"),
+      changeFrequency: "yearly" as const,
+      priority: 0.2,
+    },
     ...jobUrls,
   ]
 }

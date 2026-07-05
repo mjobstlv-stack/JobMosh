@@ -57,7 +57,11 @@
       "Bash(pnpm add *)",
       "Bash(node -e \"require\\('@vercel/blob'\\)\")",
       "Bash(node -e \"require\\('@vercel/kv'\\)\")",
-      "Bash(pnpm remove *)"
+      "Bash(pnpm remove *)",
+      "WebSearch",
+      "WebFetch(domain:iclg.com)",
+      "WebFetch(domain:www.alljobs.co.il)",
+      "WebFetch(domain:pandectes.io)"
     ],
     "additionalDirectories": [
       "C:\\Users\\yes\\Downloads\\JobMosh\\docs\\superpowers\\specs"

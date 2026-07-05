@@ -24,15 +24,19 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty"
 import { formatHebrewDate, type Application } from "@/lib/job-board-data"
-import { FileText, Inbox, X } from "lucide-react"
+import { FileText, Inbox, RefreshCw, X } from "lucide-react"
 
 export function ApplicationsTab({
   applications,
+  loading,
+  onRefresh,
   filterJobId,
   filterJobTitle,
   onClearFilter,
 }: {
   applications: Application[]
+  loading?: boolean
+  onRefresh?: () => void
   filterJobId?: string | null
   filterJobTitle?: string | null
   onClearFilter?: () => void
@@ -53,12 +57,26 @@ export function ApplicationsTab({
                 : `${applications.length} פניות שהתקבלו דרך הטופס באתר`}
             </CardDescription>
           </div>
-          {filterJobId && onClearFilter && (
-            <Button variant="outline" size="sm" onClick={onClearFilter}>
-              <X data-icon="inline-start" />
-              הצג הכל
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {onRefresh && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onRefresh}
+                disabled={loading}
+                aria-label="רענן פניות"
+              >
+                <RefreshCw className={loading ? "animate-spin" : ""} data-icon="inline-start" />
+                {loading ? "טוען..." : "רענן"}
+              </Button>
+            )}
+            {filterJobId && onClearFilter && (
+              <Button variant="outline" size="sm" onClick={onClearFilter}>
+                <X data-icon="inline-start" />
+                הצג הכל
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

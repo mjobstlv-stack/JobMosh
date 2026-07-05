@@ -4,13 +4,54 @@ import { put } from "@vercel/blob"
 
 export const runtime = "nodejs"
 
-const MAX_FILE_BYTES = 5 * 1024 * 1024 // 5MB
+const MAX_FILE_BYTES = 5 * 1024 * 1024 // 5 MB
+const ALLOWED_MIME = new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+])
+const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{2,}$/
+
+// Simple in-memory rate limit: 5 submissions per IP per minute
+const rlMap = new Map<string, { count: number; resetAt: number }>()
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = rlMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    rlMap.set(ip, { count: 1, resetAt: now + 60_000 })
+    return true
+  }
+  if (entry.count >= 5) return false
+  entry.count++
+  return true
+}
 
 function escHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+}
+
+function sanitizeFilename(name: string): string {
+  // Allow Hebrew letters, ASCII word chars, dots, hyphens; block path traversal
+  return name
+    .replace(/\.\./g, "_")
+    .replace(/[^\wא-ת.\-]/g, "_")
+    .slice(0, 100)
 }
 
 export async function POST(req: NextRequest) {
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: "יותר מדי בקשות — נסה שוב בעוד דקה" },
+      { status: 429 },
+    )
+  }
+
   const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const form = await req.formData()
@@ -29,9 +70,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "חסרים שדות חובה" }, { status: 400 })
     }
 
+    // Validate notification email format to prevent relay abuse
+    if (notificationEmail && !EMAIL_RE.test(notificationEmail)) {
+      return NextResponse.json({ error: "מייל לא תקין" }, { status: 400 })
+    }
+
     if (cvFile && cvFile.size > MAX_FILE_BYTES) {
       return NextResponse.json(
         { error: "הקובץ גדול מדי — מקסימום 5MB" },
+        { status: 400 },
+      )
+    }
+
+    // Validate MIME type
+    if (cvFile && cvFile.size > 0 && !ALLOWED_MIME.has(cvFile.type)) {
+      return NextResponse.json(
+        { error: "סוג קובץ לא נתמך — יש להעלות PDF או Word בלבד" },
         { status: 400 },
       )
     }
@@ -68,12 +122,15 @@ export async function POST(req: NextRequest) {
     if (cvFile && cvFile.size > 0) {
       const buffer = await cvFile.arrayBuffer()
       const base64 = Buffer.from(buffer).toString("base64")
-      attachments.push({ filename: cvFile.name, content: base64 })
+      attachments.push({
+        filename: sanitizeFilename(cvFile.name),
+        content: base64,
+      })
 
-      // Upload to Vercel Blob so admin can view it later
       if (process.env.BLOB_READ_WRITE_TOKEN) {
         try {
-          const blob = await put(`cv/${Date.now()}-${cvFile.name}`, cvFile, {
+          const safeName = sanitizeFilename(cvFile.name)
+          const blob = await put(`cv/${Date.now()}-${safeName}`, cvFile, {
             access: "public",
           })
           cvUrl = blob.url
@@ -110,10 +167,14 @@ export async function POST(req: NextRequest) {
             phone,
             message,
             date: new Date().toISOString().slice(0, 10),
-            cvFileName: cvFile?.name,
+            cvFileName: cvFile?.name ? sanitizeFilename(cvFile.name) : undefined,
             cvDataUrl: cvUrl,
           }),
-          { access: "public", addRandomSuffix: false, contentType: "application/json" },
+          {
+            access: "public",
+            addRandomSuffix: false,
+            contentType: "application/json",
+          },
         )
       } catch (blobErr) {
         console.error("[apply] blob application save failed:", blobErr)

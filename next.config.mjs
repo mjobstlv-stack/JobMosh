@@ -12,9 +12,10 @@ const ContentSecurityPolicy = [
   "default-src 'self'",
   scriptSrc,
   "style-src 'self' 'unsafe-inline'",
-  "font-src 'self' data:",
-  "img-src 'self' data: blob:",
-  "connect-src 'self'",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
+  // Allow same-origin + Blob CDN (CV previews) + Vercel Analytics
+  "connect-src 'self' https://*.public.blob.vercel-storage.com https://vitals.vercel-insights.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

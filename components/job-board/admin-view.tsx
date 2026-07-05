@@ -40,12 +40,19 @@ export function AdminView({
   const [filterJobId, setFilterJobId] = useState<string | null>(null)
   const [filterJobTitle, setFilterJobTitle] = useState<string | null>(null)
   const [applications, setApplications] = useState<Application[]>([])
+  const [appsLoading, setAppsLoading] = useState(false)
+
+  const fetchApplications = () => {
+    setAppsLoading(true)
+    fetch("/api/applications", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setApplications(Array.isArray(data) ? data : []))
+      .catch(() => setApplications([]))
+      .finally(() => setAppsLoading(false))
+  }
 
   useEffect(() => {
-    fetch("/api/applications")
-      .then((r) => r.ok ? r.json() : [])
-      .then((data: Application[]) => setApplications(data))
-      .catch(() => {})
+    fetchApplications()
   }, [])
 
   function handleFilterByJob(jobId: string, jobTitle: string) {
@@ -136,6 +143,8 @@ export function AdminView({
         <TabsContent value="applications">
           <ApplicationsTab
             applications={applications}
+            loading={appsLoading}
+            onRefresh={fetchApplications}
             filterJobId={filterJobId}
             filterJobTitle={filterJobTitle}
             onClearFilter={() => {

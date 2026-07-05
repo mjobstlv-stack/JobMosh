@@ -212,7 +212,14 @@ export function ApplyFormDialog({
               />
               <FieldContent>
                 <FieldLabel htmlFor="apply-consent" className="font-normal">
-                  אני מאשר/ת את מדיניות הפרטיות ושמירת הפרטים
+                  אני מאשר/ת את{" "}
+                  <a href="/terms" target="_blank" className="underline hover:text-primary">
+                    תנאי השירות
+                  </a>{" "}
+                  ו
+                  <a href="/privacy" target="_blank" className="underline hover:text-primary">
+                    מדיניות הפרטיות
+                  </a>
                 </FieldLabel>
                 {errors.consent && <FieldError>{errors.consent}</FieldError>}
               </FieldContent>

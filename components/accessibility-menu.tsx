@@ -257,7 +257,7 @@ export function AccessibilityMenu() {
 
           {/* Footer */}
           <div className="border-t border-border px-4 py-2.5 text-xs text-muted-foreground/60">
-            עמוד זה עומד בתקן נגישות ישראלי 5568
+            האתר נגיש לפי הנחיות WCAG 2.1
           </div>
         </div>
       )}
