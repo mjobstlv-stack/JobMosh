@@ -5,6 +5,7 @@ import { verifySessionToken } from "@/lib/session"
 import { INITIAL_JOBS } from "@/lib/job-board-data"
 
 export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
 const BLOB_PATH = "config/jobs.json"
 
