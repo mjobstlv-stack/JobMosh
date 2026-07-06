@@ -25,12 +25,14 @@ export function LoginRegisterDialog({
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
+  const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [forgotSent, setForgotSent] = useState(false)
 
   function switchTab(t: Tab) {
-    setTab(t); setEmail(""); setPassword(""); setConfirm(""); setError(""); setForgotSent(false)
+    setTab(t); setEmail(""); setPassword(""); setConfirm(""); setName(""); setPhone(""); setError(""); setForgotSent(false)
   }
 
   async function handleLogin(e: React.FormEvent) {
@@ -47,11 +49,12 @@ export function LoginRegisterDialog({
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
+    if (!name.trim()) { setError("שם מלא נדרש"); return }
     if (password !== confirm) { setError("הסיסמאות אינן תואמות"); return }
     setLoading(true); setError("")
     const res = await fetch("/api/user/register", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, name: name.trim(), phone: phone.trim() }),
     })
     if (!res.ok) { setError((await res.json()).error ?? "שגיאה"); setLoading(false); return }
     const me = await fetch("/api/user/me")
@@ -111,6 +114,16 @@ export function LoginRegisterDialog({
 
         {tab === "register" && (
           <form onSubmit={handleRegister} className="space-y-4">
+            <Field>
+              <FieldLabel htmlFor="reg-name">שם מלא</FieldLabel>
+              <Input id="reg-name" value={name} onChange={e => setName(e.target.value)} placeholder="ישראל ישראלי" />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="reg-phone">
+                טלפון <span className="text-muted-foreground text-xs">(אופציונלי)</span>
+              </FieldLabel>
+              <Input id="reg-phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="050-1234567" />
+            </Field>
             <Field>
               <FieldLabel htmlFor="reg-email">מייל</FieldLabel>
               <Input id="reg-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />

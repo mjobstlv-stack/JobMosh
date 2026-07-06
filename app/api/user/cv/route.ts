@@ -27,8 +27,6 @@ function safeName(name: string): string {
 export async function POST(req: NextRequest) {
   const userId = await getUserId()
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const user = await getUser(userId)
-  if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   const form = await req.formData()
   const profileIdRaw = form.get("profileId")
@@ -38,11 +36,11 @@ export async function POST(req: NextRequest) {
   if (file.size > MAX_BYTES) return NextResponse.json({ error: "הקובץ גדול מדי — מקסימום 5MB" }, { status: 400 })
   if (!ALLOWED.has(file.type)) return NextResponse.json({ error: "PDF או Word בלבד" }, { status: 400 })
 
-  const profile = user.profiles.find(p => p.id === profileId)
-  if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 })
-
-  if (profile.cvPath) {
-    try { await del(profile.cvPath) } catch { /* ignore */ }
+  // Delete old CV if provided and valid — works for both new and existing profiles
+  const oldCvPathRaw = form.get("oldCvPath")
+  const oldCvPath = typeof oldCvPathRaw === "string" ? oldCvPathRaw : null
+  if (oldCvPath && oldCvPath.startsWith(`cv/users/${userId}/`)) {
+    try { await del(oldCvPath) } catch { /* ignore */ }
   }
 
   const blob = await put(
@@ -50,12 +48,8 @@ export async function POST(req: NextRequest) {
     file,
     { access: "private" },
   )
-  profile.cvPath = blob.pathname
-  profile.cvFileName = file.name
-  await saveUser(user)
 
-  const { passwordHash: _, ...publicUser } = user
-  return NextResponse.json(publicUser)
+  return NextResponse.json({ cvPath: blob.pathname, cvFileName: file.name })
 }
 
 export async function DELETE(req: NextRequest) {

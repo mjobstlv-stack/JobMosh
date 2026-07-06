@@ -23,8 +23,9 @@ export async function POST(req: NextRequest) {
 
   let body: unknown
   try { body = await req.json() } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }) }
-  const { email, password } = body as { email?: string; password?: string }
+  const { email, password, name, phone } = body as { email?: string; password?: string; name?: string; phone?: string }
   if (!email || !password) return NextResponse.json({ error: "מייל וסיסמה נדרשים" }, { status: 400 })
+  if (!name?.trim()) return NextResponse.json({ error: "שם מלא נדרש" }, { status: 400 })
   const normalizedEmail = email.toLowerCase().trim()
   if (!EMAIL_RE.test(normalizedEmail)) return NextResponse.json({ error: "כתובת מייל לא תקינה" }, { status: 400 })
   if (typeof password !== "string" || password.length < 8)
@@ -35,12 +36,18 @@ export async function POST(req: NextRequest) {
 
   const userId = `user-${Date.now()}`
   const passwordHash = await bcrypt.hash(password, 10)
+  const defaultProfile = {
+    id: `profile-${Date.now() + 1}`,
+    title: "פרופיל ראשי",
+    name: name!.trim().slice(0, 100),
+    phone: (phone ?? "").trim().slice(0, 20),
+  }
   const user = {
     id: userId,
     email: normalizedEmail,
     passwordHash,
     createdAt: new Date().toISOString().slice(0, 10),
-    profiles: [],
+    profiles: [defaultProfile],
     applications: [],
   }
   await saveUser(user)

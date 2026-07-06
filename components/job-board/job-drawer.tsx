@@ -166,7 +166,6 @@ export function JobDrawer({
         <Drawer.Root
           open={!!job}
           onOpenChange={onOpenChange}
-          shouldScaleBackground
         >
           <Drawer.Portal>
             <Drawer.Overlay className="fixed inset-0 z-40 bg-black/50" />

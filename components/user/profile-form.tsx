@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
-import type { UserProfile, PublicUser } from "@/lib/user-types"
+import type { UserProfile } from "@/lib/user-types"
 
 export function ProfileForm({
   open,
@@ -52,12 +52,12 @@ export function ProfileForm({
       const form = new FormData()
       form.append("profileId", profileId)
       form.append("cv", cvFile)
+      if (initial?.cvPath) form.append("oldCvPath", initial.cvPath)
       const res = await fetch("/api/user/cv", { method: "POST", body: form })
       if (!res.ok) { toast.error("שגיאה בהעלאת קורות חיים"); setSaving(false); return }
-      const updated: PublicUser = await res.json()
-      const saved = updated.profiles.find(p => p.id === profileId)
-      cvPath = saved?.cvPath
-      cvFileName = saved?.cvFileName
+      const data: { cvPath: string; cvFileName: string } = await res.json()
+      cvPath = data.cvPath
+      cvFileName = data.cvFileName
     }
 
     onSave({ id: profileId, title: title.trim(), name: name.trim(), phone: phone.trim(), cvPath, cvFileName })

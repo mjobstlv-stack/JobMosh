@@ -73,6 +73,7 @@ export function PublicView({
   const jobsSectionRef = useRef<HTMLElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const drawerHistoryRef = useRef(false)
 
   useEffect(() => {
     const onScroll = () => setShowBackToTop(window.scrollY > 400)
@@ -106,6 +107,34 @@ export function PublicView({
       .then(u => setCurrentUser(u))
       .catch(() => {})
   }, [])
+
+  // Back button closes drawer instead of navigating away on mobile
+  useEffect(() => {
+    const handlePop = () => {
+      if (drawerHistoryRef.current) {
+        drawerHistoryRef.current = false
+        setActiveJob(null)
+      }
+    }
+    window.addEventListener("popstate", handlePop)
+    return () => window.removeEventListener("popstate", handlePop)
+  }, [])
+
+  function openJob(job: Job) {
+    if (!drawerHistoryRef.current) {
+      history.pushState({ jobDrawer: true }, "")
+      drawerHistoryRef.current = true
+    }
+    setActiveJob(job)
+  }
+
+  function closeDrawer() {
+    if (drawerHistoryRef.current) {
+      drawerHistoryRef.current = false
+      history.back()
+    }
+    setActiveJob(null)
+  }
 
   const selectedCategoryName = selectedCategory
     ? categories.find((c) => c.id === selectedCategory)?.name ?? null
@@ -463,7 +492,7 @@ export function PublicView({
         </div>
 
         {/* Social links */}
-        <div className="absolute bottom-14 sm:bottom-24 start-0 end-0 flex justify-center gap-5">
+        <div className="absolute bottom-14 sm:bottom-24 start-0 end-0 z-20 flex justify-center gap-5">
           {SOCIAL_LINKS.map(({ href, icon: Icon, label, color }) => (
             <a
               key={href}
@@ -471,9 +500,9 @@ export function PublicView({
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className={cn("text-white/40 transition-colors duration-200", color)}
+              className={cn("flex size-10 items-center justify-center text-white/50 transition-colors duration-200", color)}
             >
-              <Icon size={20} />
+              <Icon size={22} />
             </a>
           ))}
         </div>
@@ -587,7 +616,7 @@ export function PublicView({
                     key={job.id}
                     job={job}
                     categories={categories}
-                    onClick={() => setActiveJob(job)}
+                    onClick={() => openJob(job)}
                   />
                 ))}
               </div>
@@ -605,7 +634,7 @@ export function PublicView({
         job={activeJob}
         categories={categories}
         onOpenChange={(open) => {
-          if (!open) setActiveJob(null)
+          if (!open) closeDrawer()
         }}
         onSubmitApplication={onSubmitApplication}
         currentUser={currentUser}
