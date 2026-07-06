@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import Link from "next/link"
 import {
   REGIONS,
   JOB_TYPES,
@@ -30,9 +31,11 @@ import { CategoryGrid } from "@/components/job-board/category-grid"
 import { JobCard } from "@/components/job-board/job-card"
 import { JobAlertsWidget } from "@/components/job-board/job-alerts-widget"
 import { JobDrawer } from "@/components/job-board/job-drawer"
+import { LoginRegisterDialog } from "@/components/auth/login-register-dialog"
 import { cn } from "@/lib/utils"
-import { ArrowUp, Briefcase, Search, SearchX, X } from "lucide-react"
+import { ArrowUp, Briefcase, ChevronDown, LogOut, Search, SearchX, User as UserIcon, X } from "lucide-react"
 import { FaInstagram, FaTelegram, FaFacebook } from "react-icons/fa"
+import type { PublicUser } from "@/lib/user-types"
 
 const SOCIAL_LINKS = [
   { href: "https://www.instagram.com/mjobstlv?igsh=ZWNsb2o0OHBheDNz", icon: FaInstagram, label: "אינסטגרם", color: "hover:text-pink-400" },
@@ -64,6 +67,9 @@ export function PublicView({
   const [activeJob, setActiveJob] = useState<Job | null>(null)
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [currentUser, setCurrentUser] = useState<PublicUser | null>(null)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const jobsSectionRef = useRef<HTMLElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
 
@@ -81,6 +87,13 @@ export function PublicView({
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    fetch("/api/user/me")
+      .then(r => r.ok ? r.json() : null)
+      .then(u => setCurrentUser(u))
+      .catch(() => {})
   }, [])
 
   const selectedCategoryName = selectedCategory
@@ -238,6 +251,49 @@ export function PublicView({
                   className="cursor-pointer transition-colors hover:text-white"
                 >
                   {settings.navCareersLabel || "ייעוץ קריירה"}
+                </button>
+              )}
+              {/* User auth button */}
+              {currentUser ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(v => !v)}
+                    className="flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/20 transition-colors"
+                  >
+                    <span className="flex size-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-primary">
+                      {currentUser.profiles[0]?.name?.[0] ?? currentUser.email[0].toUpperCase()}
+                    </span>
+                    <ChevronDown className="size-3" />
+                  </button>
+                  {userMenuOpen && (
+                    <div className="absolute left-0 top-full mt-1 z-50 min-w-[140px] rounded-xl border border-border bg-card shadow-lg overflow-hidden" dir="rtl">
+                      <Link
+                        href="/profile"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-muted"
+                      >
+                        <UserIcon className="size-4" />
+                        הפרופיל שלי
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          await fetch("/api/user/logout", { method: "POST" })
+                          setCurrentUser(null); setUserMenuOpen(false)
+                        }}
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-destructive hover:bg-muted"
+                      >
+                        <LogOut className="size-4" />
+                        יציאה
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setAuthOpen(true)}
+                  className="rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white/80 hover:bg-white/20 transition-colors"
+                >
+                  כניסה
                 </button>
               )}
             </nav>
@@ -521,6 +577,7 @@ export function PublicView({
           if (!open) setActiveJob(null)
         }}
         onSubmitApplication={onSubmitApplication}
+        currentUser={currentUser}
       />
 
       <footer className="border-t border-border py-8 text-center">
@@ -557,6 +614,12 @@ export function PublicView({
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground/30">© {new Date().getFullYear()} ג&apos;וב מוש. כל הזכויות שמורות.</p>
       </footer>
+
+      <LoginRegisterDialog
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        onSuccess={(user) => { setCurrentUser(user); setAuthOpen(false) }}
+      />
 
       {/* Back to top */}
       {showBackToTop && (

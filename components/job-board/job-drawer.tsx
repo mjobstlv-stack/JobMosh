@@ -53,6 +53,7 @@ export function JobDrawer({
   categories: Category[]
   onOpenChange: (open: boolean) => void
   onSubmitApplication: (app: Application) => void
+  currentUser?: import("@/lib/user-types").PublicUser | null
 }) {
   const [applyOpen, setApplyOpen] = useState(false)
   const isMobile = useIsMobile()
