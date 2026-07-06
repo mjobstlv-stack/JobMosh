@@ -36,7 +36,8 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "profiles must be array" }, { status: 400 })
   const { profiles } = body as { profiles: unknown[] }
 
-  user.profiles = (profiles as UserProfile[]).map(p => ({
+  const validProfiles = profiles.filter(p => p !== null && typeof p === "object")
+  user.profiles = (validProfiles as UserProfile[]).map(p => ({
     id: p.id || `profile-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     title: String(p.title ?? "").slice(0, 100),
     name: String(p.name ?? "").slice(0, 100),

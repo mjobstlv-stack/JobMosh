@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
-import { put } from "@vercel/blob"
+import { get, put } from "@vercel/blob"
 import { cookies } from "next/headers"
 import { verifyUserSessionToken } from "@/lib/session"
 import { getUser, saveUser } from "@/lib/blob-user"
@@ -121,6 +121,7 @@ export async function POST(req: NextRequest) {
 
     const attachments: { filename: string; content: string }[] = []
     let cvUrl: string | undefined
+    let profileCvFileName: string | undefined
 
     if (cvFile && cvFile.size > 0) {
       const buffer = await cvFile.arrayBuffer()
@@ -138,6 +139,51 @@ export async function POST(req: NextRequest) {
         cvUrl = blob.downloadUrl
       } catch (blobErr) {
         console.error("[apply] blob upload failed (continuing):", blobErr)
+      }
+    }
+
+    // If no CV file uploaded, check if user wants to use their saved profile CV
+    if (!cvFile || cvFile.size === 0) {
+      const useProfileCv = form.get("useProfileCv") === "true"
+      const submittedProfileId = (() => {
+        const v = form.get("profileId")
+        return typeof v === "string" ? v : ""
+      })()
+
+      if (useProfileCv && submittedProfileId) {
+        try {
+          const cookieStore = await cookies()
+          const userToken = cookieStore.get("jm_user_session")?.value
+          if (userToken) {
+            const userId = verifyUserSessionToken(userToken)
+            if (userId) {
+              const user = await getUser(userId)
+              const profile = user?.profiles.find(p => p.id === submittedProfileId)
+              if (profile?.cvPath) {
+                const blobResult = await get(profile.cvPath, { access: "private" })
+                if (blobResult?.statusCode === 200 && blobResult.stream) {
+                  const chunks: Uint8Array[] = []
+                  const reader = blobResult.stream.getReader()
+                  while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) break
+                    chunks.push(value)
+                  }
+                  const buffer = Buffer.concat(chunks.map(c => Buffer.from(c)))
+                  const cvName = profile.cvFileName ?? "cv.pdf"
+                  profileCvFileName = cvName
+                  attachments.push({
+                    filename: sanitizeFilename(cvName),
+                    content: buffer.toString("base64"),
+                  })
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error("[apply] profile CV fetch failed:", err)
+          // Don't fail the application — continue without CV
+        }
       }
     }
 
@@ -167,7 +213,7 @@ export async function POST(req: NextRequest) {
           phone,
           message,
           date: new Date().toISOString().slice(0, 10),
-          cvFileName: cvFile?.name ? sanitizeFilename(cvFile.name) : undefined,
+          cvFileName: cvFile?.name ? sanitizeFilename(cvFile.name) : (profileCvFileName ? sanitizeFilename(profileCvFileName) : undefined),
           cvDataUrl: cvUrl,
         }),
         {

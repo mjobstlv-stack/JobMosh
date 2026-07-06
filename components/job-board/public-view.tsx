@@ -233,6 +233,26 @@ export function PublicView({
                 </span>
               </span>
             </div>
+            {/* Mobile auth — visible only below sm breakpoint */}
+            <div className="sm:hidden">
+              {currentUser ? (
+                <Link
+                  href="/profile"
+                  className="flex size-8 items-center justify-center rounded-full bg-amber-400 text-xs font-bold text-primary"
+                  aria-label="הפרופיל שלי"
+                >
+                  {currentUser.profiles[0]?.name?.[0] ?? currentUser.email[0].toUpperCase()}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setAuthOpen(true)}
+                  className="p-1.5 text-white/80 hover:text-white"
+                  aria-label="כניסה"
+                >
+                  <UserIcon className="size-5" />
+                </button>
+              )}
+            </div>
             <nav className="hidden items-center gap-6 text-sm text-white/60 sm:flex">
               {settings.navJobsVisible && (
                 <button

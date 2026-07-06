@@ -76,9 +76,9 @@ export function ProfileManager({
               {p.cvFileName && <p className="mt-0.5 text-xs text-primary">{p.cvFileName}</p>}
             </div>
             <div className="flex shrink-0 gap-1">
-              <Button variant="ghost" size="icon-sm"
+              <Button variant="ghost" size="icon-sm" aria-label="ערוך פרופיל"
                 onClick={() => { setEditing(p); setFormOpen(true) }}><Pencil /></Button>
-              <Button variant="ghost" size="icon-sm"
+              <Button variant="ghost" size="icon-sm" aria-label="מחק פרופיל"
                 className="text-destructive hover:text-destructive"
                 onClick={() => handleDelete(p.id)}><Trash2 /></Button>
             </div>
