@@ -28,17 +28,25 @@ export async function PUT(req: NextRequest) {
   const user = await getUser(userId)
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
-  const body = await req.json()
-  if (!Array.isArray(body.profiles))
+  let body: unknown
+  try { body = await req.json() } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
+  }
+  if (!body || typeof body !== "object" || !Array.isArray((body as Record<string, unknown>).profiles))
     return NextResponse.json({ error: "profiles must be array" }, { status: 400 })
+  const { profiles } = body as { profiles: unknown[] }
 
-  user.profiles = (body.profiles as UserProfile[]).map(p => ({
+  user.profiles = (profiles as UserProfile[]).map(p => ({
     id: p.id || `profile-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     title: String(p.title ?? "").slice(0, 100),
     name: String(p.name ?? "").slice(0, 100),
     phone: String(p.phone ?? "").slice(0, 20),
-    ...(p.cvPath ? { cvPath: p.cvPath } : {}),
-    ...(p.cvFileName ? { cvFileName: p.cvFileName } : {}),
+    ...(p.cvPath && typeof p.cvPath === "string" && p.cvPath.startsWith(`cv/users/${userId}/`)
+      ? { cvPath: p.cvPath }
+      : {}),
+    ...(p.cvFileName && typeof p.cvFileName === "string"
+      ? { cvFileName: p.cvFileName.slice(0, 200) }
+      : {}),
   }))
 
   await saveUser(user)

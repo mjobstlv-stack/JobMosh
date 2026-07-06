@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   const form = await req.formData()
-  const profileId = form.get("profileId") as string | null
+  const profileIdRaw = form.get("profileId")
+  const profileId = typeof profileIdRaw === "string" ? profileIdRaw : null
   const file = form.get("cv") as File | null
   if (!profileId || !file) return NextResponse.json({ error: "profileId and cv required" }, { status: 400 })
   if (file.size > MAX_BYTES) return NextResponse.json({ error: "הקובץ גדול מדי — מקסימום 5MB" }, { status: 400 })
@@ -63,7 +64,11 @@ export async function DELETE(req: NextRequest) {
   const user = await getUser(userId)
   if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
-  const { profileId } = await req.json()
+  let body: unknown
+  try { body = await req.json() } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
+  }
+  const { profileId } = body as { profileId?: string }
   const profile = user.profiles.find(p => p.id === profileId)
   if (!profile) return NextResponse.json({ error: "Profile not found" }, { status: 404 })
 
