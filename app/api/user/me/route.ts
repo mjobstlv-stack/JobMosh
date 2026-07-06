@@ -86,6 +86,9 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(publicUser)
   } catch (err) {
     console.error("[me PUT]", err)
-    return NextResponse.json({ error: "Internal error" }, { status: 500 })
+    return NextResponse.json({
+      error: "Internal error",
+      detail: err instanceof Error ? err.message : String(err),
+    }, { status: 500 })
   }
 }
