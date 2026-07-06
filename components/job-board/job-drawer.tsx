@@ -22,6 +22,7 @@ import {
   type Category,
   type Job,
 } from "@/lib/job-board-data"
+import type { PublicUser } from "@/lib/user-types"
 import {
   CheckCircle2,
   FileText,
@@ -48,12 +49,13 @@ export function JobDrawer({
   categories,
   onOpenChange,
   onSubmitApplication,
+  currentUser,
 }: {
   job: Job | null
   categories: Category[]
   onOpenChange: (open: boolean) => void
   onSubmitApplication: (app: Application) => void
-  currentUser?: import("@/lib/user-types").PublicUser | null
+  currentUser?: PublicUser | null
 }) {
   const [applyOpen, setApplyOpen] = useState(false)
   const isMobile = useIsMobile()
@@ -224,6 +226,7 @@ export function JobDrawer({
           open={applyOpen}
           onOpenChange={setApplyOpen}
           onSubmitApplication={onSubmitApplication}
+          currentUser={currentUser}
         />
       )}
     </>

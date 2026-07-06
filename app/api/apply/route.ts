@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { put } from "@vercel/blob"
+import { cookies } from "next/headers"
+import { verifyUserSessionToken } from "@/lib/session"
+import { getUser, saveUser } from "@/lib/blob-user"
 
 export const runtime = "nodejs"
 
@@ -175,6 +178,30 @@ export async function POST(req: NextRequest) {
       )
     } catch (blobErr) {
       console.error("[apply] blob application save failed:", blobErr)
+    }
+
+    // Record in user's application history if logged in
+    try {
+      const cookieStore = await cookies()
+      const userToken = cookieStore.get("jm_user_session")?.value
+      if (userToken) {
+        const userId = verifyUserSessionToken(userToken)
+        if (userId) {
+          const user = await getUser(userId)
+          if (user) {
+            user.applications.push({
+              jobId,
+              jobTitle,
+              company: jobCompany,
+              appliedAt: new Date().toISOString().slice(0, 10),
+              profileId: (form.get("profileId") as string | null) ?? "",
+            })
+            await saveUser(user)
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[apply] user history update failed:", err)
     }
 
     return NextResponse.json({ ok: true, cvUrl })

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
 import { toast } from "sonner"
 import {
   Dialog,
@@ -24,6 +25,8 @@ import {
 import { cn } from "@/lib/utils"
 import { UploadCloud, FileCheck2 } from "lucide-react"
 import type { Application, Job } from "@/lib/job-board-data"
+import { ProfileSelector } from "@/components/user/profile-selector"
+import type { PublicUser, UserProfile } from "@/lib/user-types"
 
 type Errors = {
   name?: string
@@ -36,11 +39,13 @@ export function ApplyFormDialog({
   open,
   onOpenChange,
   onSubmitApplication,
+  currentUser,
 }: {
   job: Job
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmitApplication: (app: Application) => void
+  currentUser?: PublicUser | null
 }) {
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
@@ -48,6 +53,18 @@ export function ApplyFormDialog({
   const [cvFile, setCvFile] = useState<File | null>(null)
   const [consent, setConsent] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null)
+  const [selectedProfile, setSelectedProfile] = useState<UserProfile | null>(null)
+
+  useEffect(() => {
+    if (open && currentUser?.profiles.length) {
+      const first = currentUser.profiles[0]
+      setSelectedProfileId(first.id)
+      setSelectedProfile(first)
+      setName(first.name)
+      setPhone(first.phone)
+    }
+  }, [open, currentUser])
 
   function reset() {
     setName("")
@@ -88,6 +105,10 @@ export function ApplyFormDialog({
     formData.append("jobCompany", job.company)
     if (job.notificationEmail) formData.append("notificationEmail", job.notificationEmail)
     if (cvFile) formData.append("cv", cvFile)
+    if (selectedProfileId) formData.append("profileId", selectedProfileId)
+    if (selectedProfile?.cvPath && !cvFile) {
+      formData.append("useProfileCv", "true")
+    }
 
     try {
       const res = await fetch("/api/apply", { method: "POST", body: formData })
@@ -138,6 +159,23 @@ export function ApplyFormDialog({
 
         <form onSubmit={handleSubmit}>
           <FieldGroup>
+            {currentUser && currentUser.profiles.length > 0 && (
+              <ProfileSelector
+                profiles={currentUser.profiles}
+                selectedId={selectedProfileId}
+                onSelect={(p) => {
+                  setSelectedProfile(p)
+                  setSelectedProfileId(p.id)
+                  setName(p.name)
+                  setPhone(p.phone)
+                }}
+              />
+            )}
+            {currentUser && currentUser.profiles.length === 0 && (
+              <div className="rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+                <Link href="/profile" className="text-primary underline">שמור פרופיל</Link> כדי למלא אוטומטית את הטופס
+              </div>
+            )}
             <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="apply-name">שם מלא</FieldLabel>
               <Input
