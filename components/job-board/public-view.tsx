@@ -57,7 +57,7 @@ export function PublicView({
   onSwitchToAdmin: () => void
 }) {
   const [query, setQuery] = useState("")
-  const [region, setRegion] = useState<string>(ALL)
+  const [regions, setRegions] = useState<string[]>([])
   const [jobType, setJobType] = useState<string>(ALL)
   const [workModel, setWorkModel] = useState<string>(ALL)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -134,9 +134,9 @@ export function PublicView({
       if (job.status !== "active") return false
       if (selectedCategory && !job.categoryIds.includes(selectedCategory))
         return false
-      if (region !== ALL) {
+      if (regions.length > 0) {
         const cityRegion = job.city ? CITY_REGION_MAP[job.city.trim()] : undefined
-        if (job.region !== region && cityRegion !== region) return false
+        if (!regions.includes(job.region) && (!cityRegion || !regions.includes(cityRegion))) return false
       }
       if (jobType !== ALL && job.jobType !== jobType) return false
       if (workModel !== ALL && job.workModel !== workModel) return false
@@ -147,18 +147,18 @@ export function PublicView({
       }
       return true
     })
-  }, [jobs, selectedCategory, region, jobType, workModel, query])
+  }, [jobs, selectedCategory, regions, jobType, workModel, query])
 
   const hasFilters =
     query.trim() !== "" ||
-    region !== ALL ||
+    regions.length > 0 ||
     jobType !== ALL ||
     workModel !== ALL ||
     selectedCategory !== null
 
   function resetFilters() {
     setQuery("")
-    setRegion(ALL)
+    setRegions([])
     setJobType(ALL)
     setWorkModel(ALL)
     setSelectedCategory(null)
@@ -332,22 +332,29 @@ export function PublicView({
             )}
             </div>
 
-            {/* Quick region filters */}
+            {/* Quick region filters — multi-select */}
             <div className="mt-3 flex flex-wrap justify-center gap-2">
-              {activeRegions.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRegion(region === r ? ALL : r)}
-                  className={cn(
-                    "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all",
-                    region === r
-                      ? "border-transparent bg-white text-primary shadow-sm"
-                      : "border-white/20 bg-white/10 text-white/65 hover:bg-white/20 hover:text-white",
-                  )}
-                >
-                  {r}
-                </button>
-              ))}
+              {activeRegions.map((r) => {
+                const active = regions.includes(r)
+                return (
+                  <button
+                    key={r}
+                    onClick={() =>
+                      setRegions((prev) =>
+                        active ? prev.filter((x) => x !== r) : [...prev, r],
+                      )
+                    }
+                    className={cn(
+                      "rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all",
+                      active
+                        ? "border-transparent bg-white text-primary shadow-sm"
+                        : "border-white/20 bg-white/10 text-white/65 hover:bg-white/20 hover:text-white",
+                    )}
+                  >
+                    {r}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
