@@ -4,10 +4,26 @@ import { getResetToken, deleteResetToken, getUser, saveUser } from "@/lib/blob-u
 
 export const runtime = "nodejs"
 
-export async function POST(req: NextRequest) {
-  const { token, newPassword } = await req.json()
+const rlMap = new Map<string, { count: number; resetAt: number }>()
+function checkRL(ip: string): boolean {
+  const now = Date.now()
+  const e = rlMap.get(ip)
+  if (!e || now > e.resetAt) { rlMap.set(ip, { count: 1, resetAt: now + 60_000 }); return true }
+  if (e.count >= 5) return false
+  e.count++; return true
+}
 
-  if (!token || typeof newPassword !== "string" || newPassword.length < 8)
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+  if (!checkRL(ip)) return NextResponse.json({ ok: true }) // silently rate-limit
+
+  let body: { token?: unknown; newPassword?: unknown }
+  try { body = await req.json() } catch {
+    return NextResponse.json({ error: "נתונים לא תקינים" }, { status: 400 })
+  }
+  const { token, newPassword } = body
+
+  if (!token || typeof token !== "string" || typeof newPassword !== "string" || newPassword.length < 8)
     return NextResponse.json({ error: "נתונים לא תקינים" }, { status: 400 })
 
   const tokenData = await getResetToken(token)
@@ -17,9 +33,9 @@ export async function POST(req: NextRequest) {
   const user = await getUser(tokenData.userId)
   if (!user) return NextResponse.json({ error: "משתמש לא נמצא" }, { status: 404 })
 
+  await deleteResetToken(token)
   user.passwordHash = await bcrypt.hash(newPassword, 10)
   await saveUser(user)
-  await deleteResetToken(token)
 
   return NextResponse.json({ ok: true })
 }

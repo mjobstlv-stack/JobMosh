@@ -18,8 +18,10 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
   if (!checkRL(ip)) return NextResponse.json({ ok: true }) // silently rate-limit
 
-  const { email } = await req.json()
-  if (!email) return NextResponse.json({ ok: true })
+  let body: { email?: unknown }
+  try { body = await req.json() } catch { return NextResponse.json({ ok: true }) }
+  const { email } = body
+  if (!email || typeof email !== "string") return NextResponse.json({ ok: true })
 
   const user = await getUserByEmail(email)
   if (!user) return NextResponse.json({ ok: true }) // no enumeration
