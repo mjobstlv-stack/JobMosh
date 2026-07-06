@@ -21,10 +21,12 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
   if (!checkRL(ip)) return NextResponse.json({ error: "יותר מדי בקשות" }, { status: 429 })
 
-  const { email, password } = await req.json()
+  let body: unknown
+  try { body = await req.json() } catch { return NextResponse.json({ error: GENERIC }, { status: 401 }) }
+  const { email, password } = body as { email?: string; password?: string }
   if (!email || !password) return NextResponse.json({ error: GENERIC }, { status: 401 })
 
-  const user = await getUserByEmail(email)
+  const user = await getUserByEmail(email.toLowerCase().trim())
   if (!user) {
     await bcrypt.hash(password, 10) // constant-time dummy to prevent timing attacks
     return NextResponse.json({ error: GENERIC }, { status: 401 })

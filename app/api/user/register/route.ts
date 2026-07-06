@@ -21,27 +21,30 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
   if (!checkRL(ip)) return NextResponse.json({ error: "יותר מדי בקשות" }, { status: 429 })
 
-  const { email, password } = await req.json()
+  let body: unknown
+  try { body = await req.json() } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }) }
+  const { email, password } = body as { email?: string; password?: string }
   if (!email || !password) return NextResponse.json({ error: "מייל וסיסמה נדרשים" }, { status: 400 })
-  if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "כתובת מייל לא תקינה" }, { status: 400 })
+  const normalizedEmail = email.toLowerCase().trim()
+  if (!EMAIL_RE.test(normalizedEmail)) return NextResponse.json({ error: "כתובת מייל לא תקינה" }, { status: 400 })
   if (typeof password !== "string" || password.length < 8)
     return NextResponse.json({ error: "הסיסמה חייבת להכיל לפחות 8 תווים" }, { status: 400 })
 
-  const existing = await getUserByEmail(email)
+  const existing = await getUserByEmail(normalizedEmail)
   if (existing) return NextResponse.json({ error: "כתובת המייל כבר רשומה" }, { status: 409 })
 
   const userId = `user-${Date.now()}`
   const passwordHash = await bcrypt.hash(password, 10)
   const user = {
     id: userId,
-    email: email.toLowerCase().trim(),
+    email: normalizedEmail,
     passwordHash,
     createdAt: new Date().toISOString().slice(0, 10),
     profiles: [],
     applications: [],
   }
   await saveUser(user)
-  await createEmailLookup(email, userId)
+  await createEmailLookup(normalizedEmail, userId)
 
   const token = createUserSessionToken(userId)
   const cookieStore = await cookies()
