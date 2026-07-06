@@ -73,6 +73,8 @@ export function ApplyFormDialog({
     setCvFile(null)
     setConsent(false)
     setErrors({})
+    setSelectedProfileId(null)
+    setSelectedProfile(null)
   }
 
   function validate(): boolean {

@@ -189,12 +189,14 @@ export async function POST(req: NextRequest) {
         if (userId) {
           const user = await getUser(userId)
           if (user) {
+            const profileIdVal = form.get("profileId")
+            const profileId = typeof profileIdVal === "string" ? profileIdVal : ""
             user.applications.push({
               jobId,
               jobTitle,
               company: jobCompany,
               appliedAt: new Date().toISOString().slice(0, 10),
-              profileId: (form.get("profileId") as string | null) ?? "",
+              profileId,
             })
             await saveUser(user)
           }
