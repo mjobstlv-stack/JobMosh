@@ -31,6 +31,7 @@ import { CategoryGrid } from "@/components/job-board/category-grid"
 import { JobCard } from "@/components/job-board/job-card"
 import { JobAlertsWidget } from "@/components/job-board/job-alerts-widget"
 import { JobDrawer } from "@/components/job-board/job-drawer"
+import { ApplyFormDialog } from "@/components/job-board/apply-form-dialog"
 import { LoginRegisterDialog } from "@/components/auth/login-register-dialog"
 import { cn } from "@/lib/utils"
 import { ArrowUp, Briefcase, ChevronDown, LogOut, Search, SearchX, User as UserIcon, X } from "lucide-react"
@@ -65,6 +66,7 @@ export function PublicView({
   const [workModel, setWorkModel] = useState<string>(ALL)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [activeJob, setActiveJob] = useState<Job | null>(null)
+  const [applyJob, setApplyJob] = useState<Job | null>(null)
   const [showBackToTop, setShowBackToTop] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [currentUser, setCurrentUser] = useState<PublicUser | null>(null)
@@ -134,6 +136,19 @@ export function PublicView({
       history.back()
     }
     setActiveJob(null)
+  }
+
+  function handleApply(job: Job) {
+    // Desktop only: close the Sheet then open the Dialog.
+    // Don't call closeDrawer() — history.back() inside it causes Next.js to reset React state.
+    if (drawerHistoryRef.current) {
+      drawerHistoryRef.current = false
+      // replaceState removes the jobDrawer marker without triggering popstate / router navigation
+      try { history.replaceState(null, "") } catch { /* ignore */ }
+    }
+    setActiveJob(null)
+    // Short delay so the Sheet close animation finishes before the Dialog mounts
+    setTimeout(() => setApplyJob(job), 200)
   }
 
   const selectedCategoryName = selectedCategory
@@ -270,7 +285,7 @@ export function PublicView({
                   className="flex size-8 items-center justify-center rounded-full bg-amber-400 text-xs font-bold text-primary"
                   aria-label="הפרופיל שלי"
                 >
-                  {currentUser.profiles[0]?.name?.[0] ?? currentUser.email[0].toUpperCase()}
+                  {currentUser.name?.[0]?.toUpperCase() ?? currentUser.email[0].toUpperCase()}
                 </Link>
               ) : (
                 <button
@@ -321,7 +336,7 @@ export function PublicView({
                     className="flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/20 transition-colors"
                   >
                     <span className="flex size-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-primary">
-                      {currentUser.profiles[0]?.name?.[0] ?? currentUser.email[0].toUpperCase()}
+                      {currentUser.name?.[0]?.toUpperCase() ?? currentUser.email[0].toUpperCase()}
                     </span>
                     <ChevronDown className="size-3" />
                   </button>
@@ -491,8 +506,8 @@ export function PublicView({
           </div>
         </div>
 
-        {/* Social links */}
-        <div className="absolute bottom-14 sm:bottom-24 start-0 end-0 z-20 flex justify-center gap-5">
+        {/* Social links — desktop only (mobile: footer only) */}
+        <div className="absolute bottom-14 sm:bottom-24 start-0 end-0 z-20 hidden sm:flex justify-center gap-5">
           {SOCIAL_LINKS.map(({ href, icon: Icon, label, color }) => (
             <a
               key={href}
@@ -636,8 +651,17 @@ export function PublicView({
         onOpenChange={(open) => {
           if (!open) closeDrawer()
         }}
-        onSubmitApplication={onSubmitApplication}
+        onApply={handleApply}
+        onSuccess={(app) => { onSubmitApplication(app) }}
         currentUser={currentUser}
+      />
+
+      <ApplyFormDialog
+        job={applyJob}
+        open={!!applyJob}
+        onOpenChange={(open) => { if (!open) setApplyJob(null) }}
+        currentUser={currentUser}
+        onSuccess={(app) => { onSubmitApplication(app); setApplyJob(null) }}
       />
 
       <footer className="border-t border-border py-8 text-center">

@@ -237,6 +237,7 @@ export async function POST(req: NextRequest) {
           if (user) {
             const profileIdVal = form.get("profileId")
             const profileId = typeof profileIdVal === "string" ? profileIdVal : ""
+            if (!user.applications) user.applications = []
             user.applications.push({
               jobId,
               jobTitle,

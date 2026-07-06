@@ -7,13 +7,12 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { JobTags } from "@/components/job-board/job-tags"
-import { ApplyFormDialog } from "@/components/job-board/apply-form-dialog"
+import { ApplyFormContent } from "@/components/job-board/apply-form-content"
 import { getCategoryIcon } from "@/lib/category-icons"
 import { cn } from "@/lib/utils"
 import {
@@ -25,13 +24,13 @@ import {
 import type { PublicUser } from "@/lib/user-types"
 import {
   CheckCircle2,
+  ChevronRight,
   FileText,
   MapPin,
   MessageCircle,
   Send,
 } from "lucide-react"
 
-/** Returns true when the viewport is narrower than Tailwind's `sm` breakpoint (640px). SSR-safe: starts false. */
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
@@ -48,17 +47,24 @@ export function JobDrawer({
   job,
   categories,
   onOpenChange,
-  onSubmitApplication,
+  onApply,
+  onSuccess,
   currentUser,
 }: {
   job: Job | null
   categories: Category[]
   onOpenChange: (open: boolean) => void
-  onSubmitApplication: (app: Application) => void
+  onApply: (job: Job) => void      // desktop only — opens external Dialog
+  onSuccess: (app: Application) => void  // mobile in-drawer form submission
   currentUser?: PublicUser | null
 }) {
-  const [applyOpen, setApplyOpen] = useState(false)
   const isMobile = useIsMobile()
+  const [applyView, setApplyView] = useState(false)
+
+  // Reset apply view whenever the active job changes
+  useEffect(() => {
+    setApplyView(false)
+  }, [job?.id])
 
   function handleWhatsApp() {
     if (!job) return
@@ -128,12 +134,17 @@ export function JobDrawer({
     </div>
   ) : null
 
+  // Apply bar — button behaviour differs: mobile opens inline form, desktop opens dialog
   const applyBar = job ? (
     <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm p-4">
       {job.allowSiteApply || job.allowWhatsApp ? (
         <div className="flex flex-col gap-2">
           {job.allowSiteApply && (
-            <Button className="h-12 w-full" size="lg" onClick={() => setApplyOpen(true)}>
+            <Button
+              className="h-12 w-full"
+              size="lg"
+              onClick={() => isMobile ? setApplyView(true) : onApply(job)}
+            >
               <Send data-icon="inline-start" />
               הגש מועמדות באתר
             </Button>
@@ -162,11 +173,8 @@ export function JobDrawer({
   return (
     <>
       {isMobile ? (
-        /* ── Mobile: vaul Drawer with native drag-to-dismiss ── */
-        <Drawer.Root
-          open={!!job}
-          onOpenChange={onOpenChange}
-        >
+        /* ── Mobile: vaul Drawer — apply form rendered INSIDE the drawer ── */
+        <Drawer.Root open={!!job} onOpenChange={onOpenChange}>
           <Drawer.Portal>
             <Drawer.Overlay className="fixed inset-0 z-40 bg-black/50" />
             <Drawer.Content
@@ -182,31 +190,58 @@ export function JobDrawer({
               <Drawer.Title className="sr-only">{job?.title ?? "משרה"}</Drawer.Title>
               <Drawer.Description className="sr-only">{job?.company}</Drawer.Description>
 
-              {/* Header */}
-              <div className="border-b border-border p-5 shrink-0">
-                {jobContent}
-              </div>
-
-              {/* Scrollable body */}
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                {jobBody}
-              </div>
-
-              {/* Apply bar */}
-              {applyBar}
+              {applyView && job ? (
+                /* ── Apply form view (inside the Drawer — no Dialog conflict) ── */
+                <>
+                  <div className="border-b border-border p-5 shrink-0 flex items-center gap-3">
+                    <button
+                      onClick={() => setApplyView(false)}
+                      className="flex items-center justify-center size-8 rounded-lg hover:bg-muted transition-colors"
+                      aria-label="חזרה"
+                    >
+                      <ChevronRight className="size-4" />
+                    </button>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground">הגשת מועמדות</p>
+                      <p className="truncate text-xs text-muted-foreground">{job.title} · {job.company}</p>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto overscroll-contain p-5">
+                    <ApplyFormContent
+                      key={job.id}
+                      job={job}
+                      currentUser={currentUser}
+                      onSuccess={(app) => {
+                        onSuccess(app)
+                        onOpenChange(false)
+                      }}
+                      onCancel={() => setApplyView(false)}
+                    />
+                  </div>
+                </>
+              ) : (
+                /* ── Job details view ── */
+                <>
+                  <div className="border-b border-border p-5 shrink-0">
+                    {jobContent}
+                  </div>
+                  <div className="flex-1 overflow-y-auto overscroll-contain">
+                    {jobBody}
+                  </div>
+                  {applyBar}
+                </>
+              )}
             </Drawer.Content>
           </Drawer.Portal>
         </Drawer.Root>
       ) : (
-        /* ── Desktop: Sheet from right ── */
+        /* ── Desktop: Sheet — apply opens an external Dialog ── */
         <Sheet open={!!job} onOpenChange={onOpenChange}>
-          <SheetContent
-            side="right"
-            className="gap-0 p-0 flex flex-col sm:max-w-lg"
-          >
+          <SheetContent side="right" className="gap-0 p-0 flex flex-col sm:max-w-lg">
             {job && (
               <>
                 <SheetHeader className="border-b border-border p-5 shrink-0">
+                  <SheetTitle className="sr-only">{job.title}</SheetTitle>
                   {jobContent}
                 </SheetHeader>
                 <ScrollArea className="flex-1 min-h-0">
@@ -217,16 +252,6 @@ export function JobDrawer({
             )}
           </SheetContent>
         </Sheet>
-      )}
-
-      {job && (
-        <ApplyFormDialog
-          job={job}
-          open={applyOpen}
-          onOpenChange={setApplyOpen}
-          onSubmitApplication={onSubmitApplication}
-          currentUser={currentUser}
-        />
       )}
     </>
   )

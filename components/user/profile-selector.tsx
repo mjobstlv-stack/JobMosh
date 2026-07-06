@@ -22,7 +22,7 @@ export function ProfileSelector({
           <div className="min-w-0">
             <p className="text-sm font-medium text-foreground">{p.title}</p>
             <p className="text-xs text-muted-foreground">
-              {p.name} · {p.phone}{p.cvFileName ? ` · ${p.cvFileName}` : ""}
+              {p.cvFileName ?? "ללא קורות חיים מצורפים"}
             </p>
           </div>
         </label>

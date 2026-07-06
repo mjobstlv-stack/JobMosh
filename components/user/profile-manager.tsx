@@ -59,7 +59,7 @@ export function ProfileManager({
       <CardHeader className="flex-row items-center justify-between gap-4">
         <div>
           <CardTitle>הפרופילים שלי</CardTitle>
-          <CardDescription>כל פרופיל מכיל שם, טלפון וקורות חיים לתפקיד שונה</CardDescription>
+          <CardDescription>שמרו קורות חיים שונים לתפקידים שונים</CardDescription>
         </div>
         <Button size="sm" onClick={() => { setEditing(null); setFormOpen(true) }}>
           <Plus data-icon="inline-start" />הוסף פרופיל
@@ -72,8 +72,10 @@ export function ProfileManager({
           <div key={p.id} className="flex items-center justify-between rounded-xl border border-border p-4">
             <div className="min-w-0">
               <p className="font-medium text-foreground">{p.title}</p>
-              <p className="text-sm text-muted-foreground">{p.name} · {p.phone}</p>
-              {p.cvFileName && <p className="mt-0.5 text-xs text-primary">{p.cvFileName}</p>}
+              {p.cvFileName
+                ? <p className="mt-0.5 text-xs text-primary">{p.cvFileName}</p>
+                : <p className="mt-0.5 text-xs text-muted-foreground">ללא קורות חיים מצורפים</p>
+              }
             </div>
             <div className="flex shrink-0 gap-1">
               <Button variant="ghost" size="icon-sm" aria-label="ערוך פרופיל"

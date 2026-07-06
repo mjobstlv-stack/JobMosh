@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import { getLiveJobs } from "@/lib/get-jobs"
 import {
-  INITIAL_JOBS,
   INITIAL_CATEGORIES,
   formatHebrewDate,
   type Job,
@@ -17,6 +17,10 @@ import {
   MessageCircle,
   Send,
 } from "lucide-react"
+
+export const runtime = "nodejs"
+// Render on every request so newly-added jobs never 404
+export const dynamic = "force-dynamic"
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -37,19 +41,7 @@ const JOB_LOCATION_TYPE: Record<string, string | undefined> = {
   מהבית: "TELECOMMUTE",
 }
 
-function findJob(id: string): Job | null {
-  return (
-    INITIAL_JOBS.find((j) => j.id === id && j.status === "active") ?? null
-  )
-}
-
 // ── Next.js route exports ───────────────────────────────────────────────────
-
-export function generateStaticParams() {
-  return INITIAL_JOBS.filter((j) => j.status === "active").map((j) => ({
-    id: j.id,
-  }))
-}
 
 export async function generateMetadata({
   params,
@@ -57,7 +49,8 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const job = findJob(id)
+  const jobs = await getLiveJobs()
+  const job: Job | undefined = jobs.find((j) => j.id === id && j.status === "active")
   if (!job) return {}
 
   const title = `${job.title} | ${job.company} — ג'וב מוש`
@@ -92,7 +85,8 @@ export default async function JobPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const job = findJob(id)
+  const jobs = await getLiveJobs()
+  const job: Job | undefined = jobs.find((j) => j.id === id && j.status === "active")
   if (!job) notFound()
 
   const categories = INITIAL_CATEGORIES.filter((c) =>
@@ -139,7 +133,6 @@ export default async function JobPage({
               ...(job.salary.type === "range"
                 ? { minValue: job.salary.min, maxValue: job.salary.max }
                 : { minValue: job.salary.min }),
-              // SalaryPeriod values ('HOUR'|'MONTH') are intentionally identical to Schema.org unitText values
               unitText: job.salary.period,
             },
           },

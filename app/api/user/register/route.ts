@@ -36,18 +36,14 @@ export async function POST(req: NextRequest) {
 
   const userId = `user-${Date.now()}`
   const passwordHash = await bcrypt.hash(password, 10)
-  const defaultProfile = {
-    id: `profile-${Date.now() + 1}`,
-    title: "פרופיל ראשי",
-    name: name!.trim().slice(0, 100),
-    phone: (phone ?? "").trim().slice(0, 20),
-  }
   const user = {
     id: userId,
     email: normalizedEmail,
     passwordHash,
+    name: name!.trim().slice(0, 100),
+    phone: (phone ?? "").trim().slice(0, 20),
     createdAt: new Date().toISOString().slice(0, 10),
-    profiles: [defaultProfile],
+    profiles: [],
     applications: [],
   }
   await saveUser(user)

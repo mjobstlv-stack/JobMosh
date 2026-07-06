@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jobmosh.co.il"
   const resend = new Resend(process.env.RESEND_API_KEY)
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: process.env.RESEND_FROM ?? "onboarding@resend.dev",
     to: [email],
     subject: "איפוס סיסמה — ג'וב מוש",
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
       </div>
     `,
   })
+  if (sendError) console.error("[forgot-password] Resend error:", sendError)
 
   return NextResponse.json({ ok: true })
 }
