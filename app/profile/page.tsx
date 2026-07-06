@@ -20,7 +20,7 @@ export default function ProfilePage() {
       fetch("/api/user/me").then(r => r.ok ? r.json() : null),
       fetch("/api/jobs").then(r => r.json()).catch(() => []),
     ]).then(([userData, jobsData]) => {
-      if (!userData) { router.push("/"); return }
+      if (!userData) { router.push("/"); setLoading(false); return }
       setUser(userData)
       setJobs(Array.isArray(jobsData) ? jobsData : [])
       setLoading(false)

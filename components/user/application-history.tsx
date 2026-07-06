@@ -36,7 +36,7 @@ export function ApplicationHistory({
                   const job = jobMap.get(app.jobId)
                   const active = job?.status === "active"
                   return (
-                    <tr key={i} className="border-b border-border/50">
+                    <tr key={`${app.jobId}-${app.appliedAt}`} className="border-b border-border/50">
                       <td className="py-3 font-medium text-foreground">{app.jobTitle}</td>
                       <td className="py-3 text-muted-foreground">{app.company}</td>
                       <td className="py-3 text-muted-foreground">{formatHebrewDate(app.appliedAt)}</td>

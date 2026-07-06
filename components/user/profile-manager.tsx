@@ -40,11 +40,15 @@ export function ProfileManager({
   async function handleDelete(id: string) {
     const profile = user.profiles.find(p => p.id === id)
     if (profile?.cvPath) {
-      await fetch("/api/user/cv", {
+      const cvRes = await fetch("/api/user/cv", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profileId: id }),
       })
+      if (!cvRes.ok) {
+        toast.error("שגיאה במחיקת קורות חיים")
+        return
+      }
     }
     await saveProfiles(user.profiles.filter(p => p.id !== id))
     toast.success("הפרופיל נמחק")
