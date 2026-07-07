@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   if (!email || typeof email !== "string") return NextResponse.json({ ok: true })
 
   const user = await getUserByEmail(email)
-  if (!user) return NextResponse.json({ ok: true }) // no enumeration
+  if (!user) return NextResponse.json({ error: "email_not_found" }, { status: 404 })
 
   const token = randomBytes(32).toString("hex")
   await saveResetToken(token, user.id)

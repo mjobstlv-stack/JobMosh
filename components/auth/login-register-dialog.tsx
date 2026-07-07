@@ -63,11 +63,14 @@ export function LoginRegisterDialog({
   }
 
   async function handleForgot(e: React.FormEvent) {
-    e.preventDefault(); setLoading(true)
-    await fetch("/api/user/forgot-password", {
+    e.preventDefault(); setLoading(true); setError("")
+    const res = await fetch("/api/user/forgot-password", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     })
+    if (!res.ok) {
+      setError("כתובת המייל אינה רשומה במערכת"); setLoading(false); return
+    }
     setForgotSent(true); setLoading(false)
   }
 
@@ -153,6 +156,7 @@ export function LoginRegisterDialog({
                 <FieldLabel htmlFor="fp-email">מייל</FieldLabel>
                 <Input id="fp-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />
               </Field>
+              {error && <FieldError>{error}</FieldError>}
               <Button type="submit" className="w-full" disabled={loading}>{loading ? "שולח..." : "שלח קישור איפוס"}</Button>
               <button type="button" onClick={() => switchTab("login")}
                 className="block w-full text-center text-sm text-muted-foreground hover:text-foreground">
