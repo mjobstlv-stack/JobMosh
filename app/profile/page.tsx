@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, LogOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { AccountForm } from "@/components/user/account-form"
 import { ProfileManager } from "@/components/user/profile-manager"
 import { ApplicationHistory } from "@/components/user/application-history"
@@ -45,6 +46,18 @@ export default function ProfilePage() {
           <Link href="/" className="font-heading text-base font-extrabold text-foreground">
             ג&apos;וב<span className="text-primary">מוש</span>
           </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 text-muted-foreground hover:text-destructive"
+            onClick={async () => {
+              await fetch("/api/user/logout", { method: "POST" })
+              router.push("/")
+            }}
+          >
+            <LogOut className="size-4" />
+            יציאה
+          </Button>
         </div>
       </header>
       <main className="mx-auto max-w-3xl space-y-8 px-4 py-10">
