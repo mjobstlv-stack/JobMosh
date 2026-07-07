@@ -25,6 +25,7 @@ export async function saveUser(user: User): Promise<void> {
   await put(`users/${user.id}.json`, JSON.stringify(user), {
     access: "private",
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: "application/json",
   })
 }
