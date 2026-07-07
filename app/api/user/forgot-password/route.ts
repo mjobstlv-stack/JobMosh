@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   })
   if (sendError) {
     console.error("[forgot-password] Resend error:", sendError)
-    return NextResponse.json({ error: "send_failed", detail: sendError.message ?? String(sendError) }, { status: 502 })
+    return NextResponse.json({ error: "send_failed" }, { status: 502 })
   }
 
   return NextResponse.json({ ok: true })

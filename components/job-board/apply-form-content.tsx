@@ -174,22 +174,34 @@ export function ApplyFormContent({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="afc-cv">קובץ קורות חיים</FieldLabel>
+          <FieldLabel htmlFor="afc-cv">
+            קובץ קורות חיים
+            {selectedProfile?.cvFileName && !cvFile && (
+              <span className="mr-1 font-normal text-xs text-primary">(מהפרופיל)</span>
+            )}
+          </FieldLabel>
           <label
             htmlFor="afc-cv"
             className={cn(
               "flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-input bg-muted/40 px-4 py-3 text-sm transition-colors hover:border-primary/50 hover:bg-accent/40",
-              cvFile && "border-primary/40 bg-accent/30",
+              (cvFile || (selectedProfile?.cvFileName && !cvFile)) && "border-primary/40 bg-accent/30",
             )}
           >
-            {cvFile ? (
+            {cvFile || selectedProfile?.cvFileName ? (
               <FileCheck2 className="size-5 text-primary" />
             ) : (
               <UploadCloud className="size-5 text-muted-foreground" />
             )}
-            <span className="truncate text-foreground">
-              {cvFile ? cvFile.name : "בחרו קובץ PDF או Word"}
+            <span className="min-w-0 flex-1 truncate text-foreground">
+              {cvFile
+                ? cvFile.name
+                : selectedProfile?.cvFileName
+                ? selectedProfile.cvFileName
+                : "בחרו קובץ PDF או Word"}
             </span>
+            {selectedProfile?.cvFileName && !cvFile && (
+              <span className="shrink-0 text-xs text-muted-foreground">לחץ להחלפה</span>
+            )}
             <input
               id="afc-cv"
               type="file"
