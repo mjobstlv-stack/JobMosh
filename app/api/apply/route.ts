@@ -119,16 +119,15 @@ export async function POST(req: NextRequest) {
       </div>
     `
 
-    const attachments: { filename: string; content: string }[] = []
+    const attachments: { filename: string; content: Buffer }[] = []
     let cvUrl: string | undefined
     let profileCvFileName: string | undefined
 
     if (cvFile && cvFile.size > 0) {
       const buffer = await cvFile.arrayBuffer()
-      const base64 = Buffer.from(buffer).toString("base64")
       attachments.push({
         filename: sanitizeFilename(cvFile.name),
-        content: base64,
+        content: Buffer.from(buffer),
       })
 
       try {
@@ -174,7 +173,7 @@ export async function POST(req: NextRequest) {
                   profileCvFileName = cvName
                   attachments.push({
                     filename: sanitizeFilename(cvName),
-                    content: buffer.toString("base64"),
+                    content: buffer,
                   })
                 }
               }
