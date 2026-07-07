@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
+import { AccountForm } from "@/components/user/account-form"
 import { ProfileManager } from "@/components/user/profile-manager"
 import { ApplicationHistory } from "@/components/user/application-history"
 import type { PublicUser } from "@/lib/user-types"
@@ -47,6 +48,7 @@ export default function ProfilePage() {
         </div>
       </header>
       <main className="mx-auto max-w-3xl space-y-8 px-4 py-10">
+        <AccountForm user={user} onUpdate={setUser} />
         <ProfileManager user={user} onUpdate={setUser} />
         <ApplicationHistory applications={user.applications} jobs={jobs} />
       </main>

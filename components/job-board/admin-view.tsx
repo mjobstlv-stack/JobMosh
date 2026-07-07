@@ -11,12 +11,14 @@ import {
   TrendingUpIcon,
   Pencil,
   MenuIcon,
+  Users,
 } from "lucide-react"
 import { JobsTab } from "@/components/job-board/admin/jobs-tab"
 import { CategoriesTab } from "@/components/job-board/admin/categories-tab"
 import { ApplicationsTab } from "@/components/job-board/admin/applications-tab"
 import { SettingsTab } from "@/components/job-board/admin/settings-tab"
 import { NavTab } from "@/components/job-board/admin/nav-tab"
+import { UsersTab } from "@/components/job-board/admin/users-tab"
 import type { Category, Job, Application, GlobalSettings } from "@/lib/job-board-data"
 
 type Props = {
@@ -121,6 +123,10 @@ export function AdminView({
             <MenuIcon data-icon="inline-start" />
             תפריט
           </TabsTrigger>
+          <TabsTrigger value="users">
+            <Users data-icon="inline-start" />
+            משתמשים
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="jobs">
@@ -158,6 +164,9 @@ export function AdminView({
         </TabsContent>
         <TabsContent value="nav">
           <NavTab settings={settings} setSettings={setSettings} />
+        </TabsContent>
+        <TabsContent value="users">
+          <UsersTab />
         </TabsContent>
       </Tabs>
     </main>
