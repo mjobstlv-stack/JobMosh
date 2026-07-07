@@ -43,11 +43,17 @@ export async function POST(req: NextRequest) {
     try { await del(oldCvPath) } catch { /* ignore */ }
   }
 
-  const blob = await put(
-    `cv/users/${userId}/${profileId}-${safeName(file.name)}`,
-    file,
-    { access: "private" },
-  )
+  let blob
+  try {
+    blob = await put(
+      `cv/users/${userId}/${profileId}-${safeName(file.name)}`,
+      file,
+      { access: "private", addRandomSuffix: false, allowOverwrite: true },
+    )
+  } catch (err) {
+    console.error("[cv POST] put error:", err)
+    return NextResponse.json({ error: "שגיאה בהעלאת הקובץ לאחסון" }, { status: 500 })
+  }
 
   return NextResponse.json({ cvPath: blob.pathname, cvFileName: file.name })
 }

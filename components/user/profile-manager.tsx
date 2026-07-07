@@ -19,13 +19,21 @@ export function ProfileManager({
   const [editing, setEditing] = useState<UserProfile | null>(null)
 
   async function saveProfiles(profiles: UserProfile[]) {
-    const res = await fetch("/api/user/me", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ profiles }),
-    })
-    if (!res.ok) { toast.error("שגיאה בשמירה"); return }
-    onUpdate(await res.json())
+    try {
+      const res = await fetch("/api/user/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profiles }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        toast.error((data as { error?: string }).error ?? "שגיאה בשמירת הפרופיל")
+        return
+      }
+      onUpdate(await res.json())
+    } catch {
+      toast.error("שגיאת רשת — נסה שנית")
+    }
   }
 
   async function handleSave(profile: UserProfile) {
