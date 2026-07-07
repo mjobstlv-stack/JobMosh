@@ -69,11 +69,10 @@ export function LoginRegisterDialog({
       body: JSON.stringify({ email }),
     })
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}))
       if (res.status === 404) {
         setError("כתובת המייל אינה רשומה במערכת")
       } else {
-        setError((data as { detail?: string }).detail ?? "שגיאה בשליחת המייל, נסה שנית")
+        setError("שגיאה בשליחת המייל — נסה שנית מאוחר יותר")
       }
       setLoading(false); return
     }
