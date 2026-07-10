@@ -39,7 +39,7 @@ import { FaInstagram, FaTelegram, FaFacebook } from "react-icons/fa"
 import type { PublicUser } from "@/lib/user-types"
 
 const SOCIAL_LINKS = [
-  { href: "https://www.instagram.com/mjobstlv?igsh=ZWNsb2o0OHBheDNz", icon: FaInstagram, label: "אינסטגרם", color: "hover:text-pink-400" },
+  { href: "https://www.instagram.com/mjobstlv", icon: FaInstagram, label: "אינסטגרם", color: "hover:text-pink-400" },
   { href: "https://t.me/+SqyxSwOXhjEyMWE0", icon: FaTelegram, label: "קבוצת טלגרם", color: "hover:text-sky-400" },
   { href: "https://t.me/mjobsisrael", icon: FaTelegram, label: "ערוץ טלגרם", color: "hover:text-sky-300" },
   { href: "https://www.facebook.com/MjobsTlv", icon: FaFacebook, label: "פייסבוק", color: "hover:text-blue-400" },
@@ -676,9 +676,13 @@ export function PublicView({
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className={cn("text-muted-foreground/40 transition-colors duration-200", color)}
+              title={label}
+              className={cn("flex items-center gap-1 text-muted-foreground/40 transition-colors duration-200 text-[11px]", color)}
             >
-              <Icon size={22} />
+              <Icon size={20} />
+              {(label === "קבוצת טלגרם" || label === "ערוץ טלגרם") && (
+                <span className="hidden sm:inline">{label}</span>
+              )}
             </a>
           ))}
         </div>
