@@ -6,7 +6,7 @@ export const runtime = "nodejs"
 export const revalidate = 3600
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://jobmosh.co.il"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const jobs = await getLiveJobs()

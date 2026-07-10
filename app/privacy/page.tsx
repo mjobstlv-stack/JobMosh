@@ -2,10 +2,13 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
+
 export const metadata: Metadata = {
   title: "מדיניות פרטיות",
   description: "מדיניות הפרטיות של ג'וב מוש — כיצד אנו אוספים ומעבדים מידע אישי.",
   robots: { index: false },
+  alternates: { canonical: `${SITE_URL}/privacy` },
 }
 
 export default function PrivacyPage() {

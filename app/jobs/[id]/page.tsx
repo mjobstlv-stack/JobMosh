@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic"
 // ── helpers ────────────────────────────────────────────────────────────────
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://jobmosh.co.il"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
 
 const EMPLOYMENT_TYPE: Record<string, string> = {
   "משרה מלאה": "FULL_TIME",

@@ -41,6 +41,16 @@ const securityHeaders = [
 const nextConfig = {
   poweredByHeader: false,
   compress: true,
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "jobmosh.co.il" }],
+        destination: "https://www.jobmosh.co.il/:path*",
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {

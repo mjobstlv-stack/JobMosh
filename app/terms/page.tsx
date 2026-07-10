@@ -2,10 +2,13 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
+
 export const metadata: Metadata = {
   title: "תנאי שירות",
-  description: "תנאי השירות של ג'וב מוש — לוח הדרושים המוביל בישראל.",
+  description: "תנאי השירות של ג'וב מוש.",
   robots: { index: false },
+  alternates: { canonical: `${SITE_URL}/terms` },
 }
 
 export default function TermsPage() {
