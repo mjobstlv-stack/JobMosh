@@ -5,6 +5,10 @@ import { getCategoryIcon } from "@/lib/category-icons"
 import type { Category, Job } from "@/lib/job-board-data"
 import { LayoutGrid } from "lucide-react"
 
+function countLabel(n: number): string {
+  return n === 1 ? "משרה אחת" : `${n} משרות`
+}
+
 export function CategoryGrid({
   categories,
   jobs,
@@ -114,7 +118,7 @@ function CategoryCard({
             active ? "text-primary-foreground/80" : "text-muted-foreground",
           )}
         >
-          {count} משרות
+          {countLabel(count)}
         </span>
       </span>
     </button>
