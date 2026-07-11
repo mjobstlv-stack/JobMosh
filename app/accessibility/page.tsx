@@ -23,7 +23,7 @@ export default function AccessibilityPage() {
             חזרה לדף הבית
           </Link>
           <Link href="/" className="font-heading text-base font-extrabold text-foreground">
-            ג&apos;וב<span className="text-primary">מוש</span>
+            ג'וב<span className="text-primary">מוש</span>
           </Link>
         </div>
       </header>
