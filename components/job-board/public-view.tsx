@@ -664,6 +664,22 @@ export function PublicView({
         onSuccess={(app) => { onSubmitApplication(app); setApplyJob(null) }}
       />
 
+      {/* Employer CTA */}
+      <section className="border-t border-border bg-accent/30 py-10 text-center">
+        <div className="mx-auto max-w-xl px-4">
+          <h2 className="font-heading text-xl font-bold text-foreground">מגייסים?</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            פרסמו משרה בחינם בג&apos;וב מוש והגיעו למועמדים רלוונטיים דרך האתר, וואטסאפ, טלגרם ואינסטגרם.
+          </p>
+          <a
+            href="mailto:info@jobmosh.co.il?subject=פרסום%20משרה"
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]"
+          >
+            צרו קשר לפרסום משרה
+          </a>
+        </div>
+      </section>
+
       <footer className="border-t border-border py-8 text-center">
         <p className="mb-3 text-sm font-medium text-muted-foreground">
           ג&apos;וב <span className="text-amber-500">מוש</span> — לוח הדרושים המושלם בישראל
