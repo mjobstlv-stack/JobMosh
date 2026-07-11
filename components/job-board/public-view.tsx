@@ -709,6 +709,9 @@ export function PublicView({
           <a href="/privacy" className="transition-colors hover:text-muted-foreground">
             מדיניות פרטיות
           </a>
+          <a href="/accessibility" className="transition-colors hover:text-muted-foreground">
+            נגישות
+          </a>
           <button
             onClick={onSwitchToAdmin}
             className="text-muted-foreground/15 hover:text-muted-foreground/40 transition-colors select-none"

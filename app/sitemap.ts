@@ -37,6 +37,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly" as const,
       priority: 0.2,
     },
+    {
+      url: `${BASE_URL}/accessibility`,
+      lastModified: new Date("2026-07-10"),
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    },
     ...jobUrls,
   ]
 }
