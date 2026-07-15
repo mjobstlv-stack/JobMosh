@@ -154,6 +154,7 @@ export type Category = {
 
 export type Job = {
   id: string
+  slug?: string
   title: string
   company: string
   region: Region
@@ -249,6 +250,7 @@ export const INITIAL_CATEGORIES: Category[] = [
 export const INITIAL_JOBS: Job[] = [
   {
     id: "job-1",
+    slug: "fullstack-developer-nova-technologies-tel-aviv",
     title: "מפתח/ת Full Stack בכיר/ה",
     company: "נובה טכנולוגיות",
     region: "מרכז",
@@ -273,6 +275,7 @@ export const INITIAL_JOBS: Job[] = [
   },
   {
     id: "job-2",
+    slug: "ux-ui-designer-pixel-studio-herzliya",
     title: "מעצב/ת מוצר UX/UI",
     company: "סטודיו פיקסל",
     region: "מרכז",
@@ -297,6 +300,7 @@ export const INITIAL_JOBS: Job[] = [
   },
   {
     id: "job-3",
+    slug: "registered-nurse-hadassah-medical-center-haifa",
     title: "אח/ות מוסמך/ת",
     company: "מרכז רפואי הדס",
     region: "צפון",
@@ -321,6 +325,7 @@ export const INITIAL_JOBS: Job[] = [
   },
   {
     id: "job-4",
+    slug: "account-manager-global-sale-ramat-gan",
     title: "מנהל/ת תיקי לקוחות",
     company: "גלובל סייל",
     region: "מרכז",
@@ -345,6 +350,7 @@ export const INITIAL_JOBS: Job[] = [
   },
   {
     id: "job-5",
+    slug: "digital-marketing-expert-buzz-media-remote",
     title: "מומחה/ית שיווק דיגיטלי",
     company: "באזז מדיה",
     region: "עבודה מהבית",
@@ -369,6 +375,7 @@ export const INITIAL_JOBS: Job[] = [
   },
   {
     id: "job-6",
+    slug: "accountant-finance-plus-jerusalem",
     title: "רואה/ת חשבון",
     company: "פיננס פלוס",
     region: "ירושלים והסביבה",
@@ -392,6 +399,7 @@ export const INITIAL_JOBS: Job[] = [
   },
   {
     id: "job-7",
+    slug: "student-tech-support-nova-technologies-beer-sheva",
     title: "סטודנט/ית לתמיכה טכנית",
     company: "נובה טכנולוגיות",
     region: "דרום",
@@ -435,6 +443,10 @@ export const INITIAL_APPLICATIONS: Application[] = [
     date: "2026-06-12",
   },
 ]
+
+export function getJobSlug(job: Pick<Job, "id" | "slug">): string {
+  return job.slug ?? job.id
+}
 
 export function formatHebrewDate(iso: string): string {
   try {

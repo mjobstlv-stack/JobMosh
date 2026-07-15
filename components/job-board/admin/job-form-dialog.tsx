@@ -129,7 +129,7 @@ export function JobFormDialog({
       .filter(Boolean)
 
     const saved: Job = {
-      id: draft.id ?? `job-${Date.now()}`,
+      id: draft.id ?? `j${Date.now().toString(36)}`,
       postedAt: draft.postedAt ?? new Date().toISOString().slice(0, 10),
       title: draft.title.trim(),
       company: draft.company.trim(),

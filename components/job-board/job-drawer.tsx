@@ -130,7 +130,7 @@ export function JobDrawer({
         </section>
       )}
 
-      <p className="text-xs text-muted-foreground">פורסם ב{formatHebrewDate(job.postedAt)}</p>
+      <p className="text-xs text-muted-foreground">פורסם ב-{formatHebrewDate(job.postedAt)}</p>
     </div>
   ) : null
 

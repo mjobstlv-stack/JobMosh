@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   description: "תנאי השירות של ג'וב מוש.",
   robots: { index: false },
   alternates: { canonical: `${SITE_URL}/terms` },
+  openGraph: {
+    title: "תנאי שירות | ג'וב מוש",
+    description: "תנאי השירות של ג'וב מוש.",
+    url: `${SITE_URL}/terms`,
+  },
 }
 
 export default function TermsPage() {

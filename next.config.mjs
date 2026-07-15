@@ -49,6 +49,14 @@ const nextConfig = {
         destination: "https://www.jobmosh.co.il/:path*",
         permanent: true,
       },
+      // Legacy sequential job IDs → SEO-friendly slugs
+      { source: "/jobs/job-1", destination: "/jobs/fullstack-developer-nova-technologies-tel-aviv", permanent: true },
+      { source: "/jobs/job-2", destination: "/jobs/ux-ui-designer-pixel-studio-herzliya", permanent: true },
+      { source: "/jobs/job-3", destination: "/jobs/registered-nurse-hadassah-medical-center-haifa", permanent: true },
+      { source: "/jobs/job-4", destination: "/jobs/account-manager-global-sale-ramat-gan", permanent: true },
+      { source: "/jobs/job-5", destination: "/jobs/digital-marketing-expert-buzz-media-remote", permanent: true },
+      { source: "/jobs/job-6", destination: "/jobs/accountant-finance-plus-jerusalem", permanent: true },
+      { source: "/jobs/job-7", destination: "/jobs/student-tech-support-nova-technologies-beer-sheva", permanent: true },
     ]
   },
   async headers() {

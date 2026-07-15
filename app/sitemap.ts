@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next"
 import { getLiveJobs } from "@/lib/get-jobs"
+import { getJobSlug } from "@/lib/job-board-data"
 
 export const runtime = "nodejs"
 // Revalidate once per hour — jobs change infrequently
@@ -12,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const jobs = await getLiveJobs()
 
   const jobUrls = jobs.filter((j) => j.status === "active").map((j) => ({
-    url: `${BASE_URL}/jobs/${j.id}`,
+    url: `${BASE_URL}/jobs/${getJobSlug(j)}`,
     lastModified: new Date(j.postedAt),
     changeFrequency: "weekly" as const,
     priority: 0.8,
@@ -24,6 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 1,
+    },
+    {
+      url: `${BASE_URL}/about`,
+      lastModified: new Date("2026-07-10"),
+      changeFrequency: "yearly" as const,
+      priority: 0.4,
     },
     {
       url: `${BASE_URL}/terms`,

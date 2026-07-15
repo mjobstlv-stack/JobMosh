@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   InputGroup,
   InputGroupInput,
@@ -12,6 +13,7 @@ import { BellRing, Mail, Send } from "lucide-react"
 
 export function JobAlertsWidget() {
   const [email, setEmail] = useState("")
+  const [consent, setConsent] = useState(false)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -20,10 +22,15 @@ export function JobAlertsWidget() {
       toast.error("נא להזין כתובת אימייל תקינה")
       return
     }
+    if (!consent) {
+      toast.error("יש לאשר קבלת התראות כדי להירשם")
+      return
+    }
     toast.success("נרשמתם בהצלחה!", {
       description: "נעדכן אתכם במשרות חדשות שמתאימות לכם.",
     })
     setEmail("")
+    setConsent(false)
   }
 
   return (
@@ -48,32 +55,49 @@ export function JobAlertsWidget() {
           </div>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row"
-        >
-          <InputGroup className="w-full bg-background sm:w-64">
-            <InputGroupInput
-              type="email"
-              dir="ltr"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              aria-label="כתובת אימייל"
-            />
-            <InputGroupAddon>
-              <Mail />
-            </InputGroupAddon>
-          </InputGroup>
-          <Button
-            type="submit"
-            variant="secondary"
-            className="h-11 shrink-0"
+        <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full flex-col gap-2 sm:flex-row"
           >
-            <Send data-icon="inline-start" />
-            הרשמה
-          </Button>
-        </form>
+            <InputGroup className="w-full bg-background sm:w-64">
+              <InputGroupInput
+                type="email"
+                dir="ltr"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-label="כתובת אימייל"
+              />
+              <InputGroupAddon>
+                <Mail />
+              </InputGroupAddon>
+            </InputGroup>
+            <Button
+              type="submit"
+              variant="secondary"
+              className="h-11 shrink-0"
+            >
+              <Send data-icon="inline-start" />
+              הרשמה
+            </Button>
+          </form>
+          <label className="flex items-start gap-2 cursor-pointer">
+            <Checkbox
+              checked={consent}
+              onCheckedChange={(v) => setConsent(!!v)}
+              className="mt-0.5 shrink-0 border-primary-foreground/40 data-[state=checked]:bg-primary-foreground data-[state=checked]:text-primary"
+              id="alerts-consent"
+            />
+            <span className="text-[11px] leading-snug text-primary-foreground/60">
+              אני מסכים/ה לקבל התראות על משרות חדשות בדוא"ל. ניתן לבטל בכל עת דרך{" "}
+              <a href="mailto:info@jobmosh.co.il?subject=הסרה%20מרשימת%20התראות" className="underline hover:text-primary-foreground/90">
+                פנייה אלינו
+              </a>
+              .
+            </span>
+          </label>
+        </div>
       </div>
     </div>
   )

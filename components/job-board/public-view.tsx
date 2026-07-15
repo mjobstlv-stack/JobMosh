@@ -489,21 +489,7 @@ export function PublicView({
             </div>
           </div>
 
-          {/* Stats bar */}
-          <div className="mt-10 flex justify-center gap-8 sm:gap-14">
-            {[
-              { n: `${activeCount}+`, label: "משרות פעילות" },
-              { n: `${activeCategories.length}`, label: "תחומי עיסוק" },
-              { n: "100%", label: "חינמי לחלוטין" },
-            ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
-                <span className="text-2xl font-extrabold text-white sm:text-3xl">
-                  {stat.n}
-                </span>
-                <span className="mt-1 text-xs text-white/45">{stat.label}</span>
-              </div>
-            ))}
-          </div>
+          {/* Stats bar removed — numeric counts undermined credibility when inventory is small */}
         </div>
 
         {/* Social links — desktop only (mobile: footer only) */}
@@ -703,6 +689,9 @@ export function PublicView({
           ))}
         </div>
         <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground/50">
+          <a href="/about" className="transition-colors hover:text-muted-foreground">
+            אודות
+          </a>
           <a href="/terms" className="transition-colors hover:text-muted-foreground">
             תנאי שירות
           </a>

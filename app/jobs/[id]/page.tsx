@@ -5,6 +5,7 @@ import { getLiveJobs } from "@/lib/get-jobs"
 import {
   INITIAL_CATEGORIES,
   formatHebrewDate,
+  getJobSlug,
   type Job,
 } from "@/lib/job-board-data"
 import { formatSalary } from "@/lib/utils"
@@ -50,12 +51,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params
   const jobs = await getLiveJobs()
-  const job: Job | undefined = jobs.find((j) => j.id === id && j.status === "active")
+  const job: Job | undefined = jobs.find(
+    (j) => (getJobSlug(j) === id || j.id === id) && j.status === "active"
+  )
   if (!job) return {}
 
   const title = `${job.title} | ${job.company} — ג'וב מוש`
   const description = `${job.title} ב${job.company}, ${job.city}. ${job.description.slice(0, 140)}...`
-  const url = `${SITE_URL}/jobs/${job.id}`
+  const url = `${SITE_URL}/jobs/${getJobSlug(job)}`
 
   return {
     title,
@@ -86,7 +89,9 @@ export default async function JobPage({
 }) {
   const { id } = await params
   const jobs = await getLiveJobs()
-  const job: Job | undefined = jobs.find((j) => j.id === id && j.status === "active")
+  const job: Job | undefined = jobs.find(
+    (j) => (getJobSlug(j) === id || j.id === id) && j.status === "active"
+  )
   if (!job) notFound()
 
   const categories = INITIAL_CATEGORIES.filter((c) =>

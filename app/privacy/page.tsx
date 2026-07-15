@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   description: "מדיניות הפרטיות של ג'וב מוש — כיצד אנו אוספים ומעבדים מידע אישי.",
   robots: { index: false },
   alternates: { canonical: `${SITE_URL}/privacy` },
+  openGraph: {
+    title: "מדיניות פרטיות | ג'וב מוש",
+    description: "מדיניות הפרטיות של ג'וב מוש — כיצד אנו אוספים ומעבדים מידע אישי.",
+    url: `${SITE_URL}/privacy`,
+  },
 }
 
 export default function PrivacyPage() {

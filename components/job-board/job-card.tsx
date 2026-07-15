@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { JobTags } from "@/components/job-board/job-tags"
 import { getCategoryIcon } from "@/lib/category-icons"
 import { cn, formatSalary } from "@/lib/utils"
-import { formatHebrewDate, type Category, type Job } from "@/lib/job-board-data"
+import { formatHebrewDate, getJobSlug, type Category, type Job } from "@/lib/job-board-data"
 import Link from "next/link"
 import { ChevronLeft, ExternalLink, MessageCircle, Send } from "lucide-react"
 
@@ -83,10 +83,10 @@ export function JobCard({
       <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
         <div className="flex items-center gap-3">
           <p className="text-xs text-muted-foreground/60">
-            פורסם ב{formatHebrewDate(job.postedAt)}
+            פורסם ב-{formatHebrewDate(job.postedAt)}
           </p>
           <Link
-            href={`/jobs/${job.id}`}
+            href={`/jobs/${getJobSlug(job)}`}
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1 text-xs text-muted-foreground/50 transition-colors hover:text-primary"
             aria-label="דף המשרה"
