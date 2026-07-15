@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { list, put, del, get } from "@vercel/blob"
-import { cookies } from "next/headers"
-import { verifySessionToken } from "@/lib/session"
+import { requireAdminPermission } from "@/lib/admin-auth"
 import { INITIAL_CATEGORIES } from "@/lib/job-board-data"
 
 export const runtime = "nodejs"
@@ -22,9 +21,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const jar = await cookies()
-  const token = jar.get("jm_session")?.value
-  if (!token || !verifySessionToken(token)) {
+  const auth = await requireAdminPermission("categories")
+  if (!auth.ok) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

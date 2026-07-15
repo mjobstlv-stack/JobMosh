@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { cookies } from "next/headers"
-import { verifySessionToken } from "@/lib/session"
+import { requireAdminPermission } from "@/lib/admin-auth"
 
 export const runtime = "nodejs"
 
 export async function GET(req: NextRequest) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("jm_session")?.value
-  if (!token || !verifySessionToken(token)) {
+  // CV files are part of the applications workflow
+  const auth = await requireAdminPermission("applications")
+  if (!auth.ok) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 

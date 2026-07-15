@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server"
 import { list, get } from "@vercel/blob"
-import { cookies } from "next/headers"
-import { verifySessionToken } from "@/lib/session"
+import { requireAdminPermission } from "@/lib/admin-auth"
 
 export const runtime = "nodejs"
 
 export async function GET() {
-  // Only authenticated admins may read applications
-  const cookieStore = await cookies()
-  const token = cookieStore.get("jm_session")?.value
-  if (!token || !verifySessionToken(token)) {
+  // Only admins with the applications permission may read applications
+  const auth = await requireAdminPermission("applications")
+  if (!auth.ok) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 

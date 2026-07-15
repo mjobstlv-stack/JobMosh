@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server"
 import { list } from "@vercel/blob"
-import { cookies } from "next/headers"
-import { verifySessionToken } from "@/lib/session"
+import { requireAdminPermission } from "@/lib/admin-auth"
 import { getUser } from "@/lib/blob-user"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export async function GET() {
-  const jar = await cookies()
-  const token = jar.get("jm_session")?.value
-  if (!token || !verifySessionToken(token)) {
+  const auth = await requireAdminPermission("users")
+  if (!auth.ok) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
