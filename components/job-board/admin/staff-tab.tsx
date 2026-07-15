@@ -123,23 +123,23 @@ function StaffForm({
             {initial ? "סיסמה חדשה (השאר ריק לאי-שינוי)" : "סיסמה"}
           </label>
           <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              className="absolute inset-y-0 start-2 flex items-center text-muted-foreground hover:text-foreground"
+              tabIndex={-1}
+            >
+              {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
             <input
               type={showPw ? "text" : "password"}
               dir="ltr"
-              className="w-full rounded-lg border bg-background px-3 py-2 pe-9 text-sm outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full rounded-lg border bg-background px-3 py-2 ps-9 text-sm outline-none focus:ring-2 focus:ring-primary/40"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={initial ? "••••••••" : "לפחות 8 תווים"}
               minLength={initial ? undefined : 8}
             />
-            <button
-              type="button"
-              onClick={() => setShowPw((v) => !v)}
-              className="absolute inset-y-0 end-2 flex items-center text-muted-foreground hover:text-foreground"
-              tabIndex={-1}
-            >
-              {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
           </div>
         </div>
       </div>
@@ -174,13 +174,20 @@ function StaffRow({
 }) {
   return (
     <div
-      className={`flex items-start gap-3 rounded-xl border p-4 transition-opacity ${staff.active ? "" : "opacity-50"}`}
+      className={`flex items-start gap-3 rounded-xl border p-4 ${staff.active ? "" : "border-destructive/20 bg-destructive/5"}`}
     >
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
-        <ShieldCheck className="size-4 text-muted-foreground" />
+      <div className={`flex size-9 shrink-0 items-center justify-center rounded-full ${staff.active ? "bg-muted" : "bg-destructive/10"}`}>
+        <ShieldCheck className={`size-4 ${staff.active ? "text-muted-foreground" : "text-destructive/60"}`} />
       </div>
       <div className="min-w-0 flex-1 space-y-1">
-        <p className="text-sm font-medium leading-none">{staff.name}</p>
+        <div className="flex items-center gap-2">
+          <p className={`text-sm font-medium leading-none ${staff.active ? "" : "text-destructive"}`}>{staff.name}</p>
+          {!staff.active && (
+            <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
+              מושבת
+            </span>
+          )}
+        </div>
         <p className="text-xs text-muted-foreground" dir="ltr">{staff.email}</p>
         <div className="flex flex-wrap gap-1.5 pt-1">
           {staff.permissions.length === 0 ? (
