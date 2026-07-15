@@ -108,7 +108,25 @@
       "Bash(pnpm build *)",
       "Bash(gh run *)",
       "PowerShell(gh run list --limit 3 2>&1)",
-      "Bash(git status *)"
+      "Bash(git status *)",
+      "Bash(timeout 120 bash -c 'while ! grep -q \"successfully\\\\|error\\\\|Error\\\\|FAILED\" \"C:\\\\\\\\Users\\\\\\\\yes\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\c--Users-yes-Downloads-JobMosh\\\\\\\\ec5d46b0-28bf-4dcc-b067-69d8d4b00a03\\\\\\\\tasks\\\\\\\\b29cfepyw.output\"; do sleep 1; done; tail -20 \"C:\\\\\\\\Users\\\\\\\\yes\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\c--Users-yes-Downloads-JobMosh\\\\\\\\ec5d46b0-28bf-4dcc-b067-69d8d4b00a03\\\\\\\\tasks\\\\\\\\b29cfepyw.output\"')",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/review-package\" \"c2bf9164af6f9dc2f0e7b9f3c7e9220f4ba6882e\" HEAD)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/task-brief\" \"docs/superpowers/plans/2026-07-10-seo-and-brand-audit-fixes.md\" 2)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/review-package\" \"a50d906c0b514dc23f548288212a25c5bd0a1c13\" HEAD)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/task-brief\" \"docs/superpowers/plans/2026-07-10-seo-and-brand-audit-fixes.md\" 3)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/review-package\" \"c650d7e40867e1c77de6b0084b5db4c1830b7b2f\" HEAD)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/task-brief\" \"docs/superpowers/plans/2026-07-10-seo-and-brand-audit-fixes.md\" 4)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/review-package\" \"b51a0c11c31b4834a8ed1aa4fe1f467bf9806c69\" HEAD)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/task-brief\" \"docs/superpowers/plans/2026-07-10-seo-and-brand-audit-fixes.md\" 5)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/review-package\" \"f58906681b3125f2c26eedb3ce128bcb63b657ac\" HEAD)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/task-brief\" \"docs/superpowers/plans/2026-07-10-seo-and-brand-audit-fixes.md\" 6)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/review-package\" \"3855ece014b81b615906b6d78469f71b44bc8d5c\" HEAD)",
+      "Bash(bash \"C:/Users/yes/.claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/task-brief\" \"docs/superpowers/plans/2026-07-10-seo-and-brand-audit-fixes.md\" 7)",
+      "Bash(bash .claude/plugins/cache/claude-plugins-official/superpowers/d884ae04edeb/skills/subagent-driven-development/scripts/review-package 8005480452d89b77c52a00a6f8853e10c9afae8e HEAD)",
+      "Read(//c/Users/yes/.claude/plugins/**)",
+      "Bash(bash \"C:\\\\Users\\\\yes\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\6.1.1\\\\skills\\\\subagent-driven-development\\\\scripts\\\\review-package\" 8005480452d89b77c52a00a6f8853e10c9afae8e HEAD)",
+      "Bash(bash \"C:\\\\Users\\\\yes\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\6.1.1\\\\skills\\\\subagent-driven-development\\\\scripts\\\\review-package\" c2bf9164af6f9dc2f0e7b9f3c7e9220f4ba6882e HEAD)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts,null,2\\)\\)\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\yes\\Downloads\\JobMosh\\docs\\superpowers\\specs"
