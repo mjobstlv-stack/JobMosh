@@ -703,10 +703,10 @@ export function PublicView({
           </a>
           <button
             onClick={onSwitchToAdmin}
-            className="text-muted-foreground/15 hover:text-muted-foreground/40 transition-colors select-none"
+            className="text-muted-foreground/30 hover:text-muted-foreground/70 transition-colors select-none text-base leading-none"
             aria-label="כניסה למנהל"
           >
-            ·
+            ⚙
           </button>
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground/30">© {new Date().getFullYear()} ג&apos;וב מוש. כל הזכויות שמורות.</p>
