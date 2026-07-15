@@ -32,18 +32,23 @@ export default function Page() {
     navCareersLabel: "ייעוץ קריירה",
   })
 
-  // Load jobs + categories from Blob on every mount so all devices stay in sync
-  useEffect(() => {
-    fetch("/api/jobs")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => { if (Array.isArray(data) && data.length > 0) setJobsState(data) })
-      .catch(() => {})
-
-    fetch("/api/categories")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => { if (Array.isArray(data) && data.length > 0) setCategoriesState(data) })
-      .catch(() => {})
+  const refreshData = useCallback(async () => {
+    const [jobsRes, catsRes] = await Promise.all([
+      fetch("/api/jobs").catch(() => null),
+      fetch("/api/categories").catch(() => null),
+    ])
+    if (jobsRes?.ok) {
+      const data = await jobsRes.json().catch(() => null)
+      if (Array.isArray(data) && data.length > 0) setJobsState(data)
+    }
+    if (catsRes?.ok) {
+      const data = await catsRes.json().catch(() => null)
+      if (Array.isArray(data) && data.length > 0) setCategoriesState(data)
+    }
   }, [])
+
+  // Load jobs + categories from Blob on every mount so all devices stay in sync
+  useEffect(() => { refreshData() }, [refreshData])
 
   // Wrapped setters: update state AND persist to Blob immediately
   const setJobs = useCallback<React.Dispatch<React.SetStateAction<Job[]>>>((action) => {
@@ -111,6 +116,7 @@ export default function Page() {
               settings={settings}
               setSettings={setSettings}
               permissions={adminPermissions}
+              onRefresh={refreshData}
             />
           </div>
         </LoginGate>

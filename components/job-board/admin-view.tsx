@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useCallback } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -12,6 +12,7 @@ import {
   Pencil,
   MenuIcon,
   Users,
+  RefreshCw,
 } from "lucide-react"
 import { JobsTab } from "@/components/job-board/admin/jobs-tab"
 import { CategoriesTab } from "@/components/job-board/admin/categories-tab"
@@ -32,6 +33,7 @@ type Props = {
   setSettings: React.Dispatch<React.SetStateAction<GlobalSettings>>
   /** null = superadmin (all tabs visible); array = staff with these permissions only */
   permissions: AdminPermission[] | null
+  onRefresh: () => Promise<void>
 }
 
 export function AdminView({
@@ -42,6 +44,7 @@ export function AdminView({
   settings,
   setSettings,
   permissions,
+  onRefresh,
 }: Props) {
   const can = (p: AdminPermission) => permissions === null || permissions.includes(p)
   const [activeTab, setActiveTab] = useState("jobs")
@@ -49,19 +52,26 @@ export function AdminView({
   const [filterJobTitle, setFilterJobTitle] = useState<string | null>(null)
   const [applications, setApplications] = useState<Application[]>([])
   const [appsLoading, setAppsLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
-  const fetchApplications = () => {
+  const fetchApplications = useCallback(() => {
     setAppsLoading(true)
     fetch("/api/applications", { credentials: "include" })
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => setApplications(Array.isArray(data) ? data : []))
       .catch(() => setApplications([]))
       .finally(() => setAppsLoading(false))
-  }
+  }, [])
 
   useEffect(() => {
     fetchApplications()
-  }, [])
+  }, [fetchApplications])
+
+  async function handleRefresh() {
+    setRefreshing(true)
+    await Promise.all([onRefresh(), new Promise<void>((r) => { fetchApplications(); r() })])
+    setRefreshing(false)
+  }
 
   function handleFilterByJob(jobId: string, jobTitle: string) {
     setFilterJobId(jobId)
@@ -87,8 +97,22 @@ export function AdminView({
           <TrendingUpIcon className="size-4" />
           ניהול מערכת
         </div>
-        <h1 className="text-pretty text-3xl font-bold tracking-tight">לוח בקרה</h1>
-        <p className="mt-1 text-muted-foreground">ניהול משרות, קטגוריות ופניות מועמדים במקום אחד</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-pretty text-3xl font-bold tracking-tight">לוח בקרה</h1>
+            <p className="mt-1 text-muted-foreground">ניהול משרות, קטגוריות ופניות מועמדים במקום אחד</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            title="רענן נתונים"
+            className="mt-1 flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2 text-sm text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
+          >
+            <RefreshCw className={`size-4 ${refreshing ? "animate-spin" : ""}`} />
+            רענן
+          </button>
+        </div>
       </header>
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
