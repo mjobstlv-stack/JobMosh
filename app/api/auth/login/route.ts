@@ -1,10 +1,29 @@
 export const runtime = "nodejs"
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createSessionToken, createStaffToken, safeEqual } from "@/lib/session"
 import { findStaffByEmail, verifyStaffPassword } from "@/lib/admin-staff"
 
-export async function POST(req: Request) {
+// 5 login attempts per IP per minute — same policy as user login
+const rlMap = new Map<string, { count: number; resetAt: number }>()
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = rlMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    rlMap.set(ip, { count: 1, resetAt: now + 60_000 })
+    return true
+  }
+  if (entry.count >= 5) return false
+  entry.count++
+  return true
+}
+
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: "יותר מדי ניסיונות — נסה שוב בעוד דקה" }, { status: 429 })
+  }
+
   let body: { username?: string; password?: string }
   try {
     body = await req.json()
