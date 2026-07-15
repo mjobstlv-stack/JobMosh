@@ -11,12 +11,14 @@ import {
 } from "@/lib/job-board-data"
 import { PublicView } from "@/components/job-board/public-view"
 import { AdminView } from "@/components/job-board/admin-view"
-import { LoginGate } from "@/components/job-board/login-gate"
+import { LoginGate, type AuthInfo } from "@/components/job-board/login-gate"
 import { usePersistedState } from "@/hooks/use-persisted-state"
 import { UserRound } from "lucide-react"
+import type { AdminPermission } from "@/lib/admin-staff"
 
 export default function Page() {
   const [role, setRole] = useState<"public" | "admin">("public")
+  const [adminPermissions, setAdminPermissions] = useState<AdminPermission[] | null>(null)
   const [jobs, setJobsState] = useState<Job[]>(INITIAL_JOBS)
   const [categories, setCategoriesState] = useState<Category[]>(INITIAL_CATEGORIES)
 
@@ -70,9 +72,14 @@ export default function Page() {
     })
   }, [])
 
+  function handleAuth(info: AuthInfo) {
+    setAdminPermissions(info.permissions)
+  }
+
   async function handleSwitchToPublic() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
     setRole("public")
+    setAdminPermissions(null)
   }
 
   return (
@@ -86,7 +93,7 @@ export default function Page() {
           onSwitchToAdmin={() => setRole("admin")}
         />
       ) : (
-        <LoginGate onBack={() => setRole("public")}>
+        <LoginGate onBack={() => setRole("public")} onAuth={handleAuth}>
           <div className="relative">
             <button
               type="button"
@@ -103,6 +110,7 @@ export default function Page() {
               setCategories={setCategories}
               settings={settings}
               setSettings={setSettings}
+              permissions={adminPermissions}
             />
           </div>
         </LoginGate>

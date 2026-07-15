@@ -1,7 +1,8 @@
 export const runtime = "nodejs"
 
 import { NextResponse } from "next/server"
-import { createSessionToken, safeEqual } from "@/lib/session"
+import { createSessionToken, createStaffToken, safeEqual } from "@/lib/session"
+import { findStaffByEmail, verifyStaffPassword } from "@/lib/admin-staff"
 
 export async function POST(req: Request) {
   let body: { username?: string; password?: string }
@@ -21,25 +22,40 @@ export async function POST(req: Request) {
   const userOk = safeEqual(username, correctUser)
   const passOk = safeEqual(password, correctPass)
 
-  if (!userOk || !passOk) {
-    // Fixed-time delay makes brute-force significantly slower
-    await new Promise((r) => setTimeout(r, 1200 + Math.random() * 400))
-    return NextResponse.json(
-      { error: "שם משתמש או סיסמה שגויים" },
-      { status: 401 },
-    )
+  if (userOk && passOk) {
+    const token = createSessionToken()
+    const res = NextResponse.json({ ok: true, role: "superadmin" })
+    res.cookies.set("jm_session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60,
+      path: "/",
+    })
+    return res
   }
 
-  const token = createSessionToken()
-  const res = NextResponse.json({ ok: true })
+  // Superadmin check failed — try staff login (email-based)
+  await new Promise((r) => setTimeout(r, 400 + Math.random() * 200))
 
-  res.cookies.set("jm_session", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 24 * 60 * 60, // 24h
-    path: "/",
-  })
+  try {
+    const staff = await findStaffByEmail(username)
+    if (staff && verifyStaffPassword(password, staff.passwordHash)) {
+      const token = createStaffToken(staff.id)
+      const res = NextResponse.json({ ok: true, role: "staff", permissions: staff.permissions })
+      res.cookies.set("jm_staff_session", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 12 * 60 * 60,
+        path: "/",
+      })
+      return res
+    }
+  } catch {
+    // Blob lookup failure — fall through to generic error
+  }
 
-  return res
+  await new Promise((r) => setTimeout(r, 800 + Math.random() * 400))
+  return NextResponse.json({ error: "שם משתמש או סיסמה שגויים" }, { status: 401 })
 }

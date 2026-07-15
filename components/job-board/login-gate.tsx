@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from "react"
 import { Briefcase, ChevronRight, Eye, EyeOff, Lock, User } from "lucide-react"
+import type { AdminPermission } from "@/lib/admin-staff"
 
-const STORAGE_KEY = "jm_auth_v1"
+export type AuthInfo = { role: "superadmin" | "staff"; permissions: AdminPermission[] | null }
 
 export function LoginGate({
   children,
   onBack,
+  onAuth,
 }: {
   children: React.ReactNode
   onBack?: () => void
+  onAuth?: (info: AuthInfo) => void
 }) {
   const [auth, setAuth] = useState<"loading" | "ok" | "no">("loading")
   const [username, setUsername] = useState("")
@@ -23,8 +26,20 @@ export function LoginGate({
   // Verify session cookie with the server on mount
   useEffect(() => {
     fetch("/api/auth/verify")
-      .then((r) => setAuth(r.ok ? "ok" : "no"))
+      .then(async (r) => {
+        if (r.ok) {
+          const data = await r.json().catch(() => ({}))
+          onAuth?.({
+            role: data.role ?? "superadmin",
+            permissions: data.role === "staff" ? (data.permissions ?? []) : null,
+          })
+          setAuth("ok")
+        } else {
+          setAuth("no")
+        }
+      })
       .catch(() => setAuth("no"))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -40,6 +55,11 @@ export function LoginGate({
       })
 
       if (res.ok) {
+        const data = await res.json().catch(() => ({}))
+        onAuth?.({
+          role: data.role ?? "superadmin",
+          permissions: data.role === "staff" ? (data.permissions ?? []) : null,
+        })
         setAuth("ok")
       } else {
         const data = await res.json().catch(() => ({}))

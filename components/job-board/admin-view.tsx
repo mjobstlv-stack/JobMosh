@@ -19,7 +19,9 @@ import { ApplicationsTab } from "@/components/job-board/admin/applications-tab"
 import { SettingsTab } from "@/components/job-board/admin/settings-tab"
 import { NavTab } from "@/components/job-board/admin/nav-tab"
 import { UsersTab } from "@/components/job-board/admin/users-tab"
+import { StaffTab } from "@/components/job-board/admin/staff-tab"
 import type { Category, Job, Application, GlobalSettings } from "@/lib/job-board-data"
+import type { AdminPermission } from "@/lib/admin-staff"
 
 type Props = {
   jobs: Job[]
@@ -28,6 +30,8 @@ type Props = {
   setCategories: React.Dispatch<React.SetStateAction<Category[]>>
   settings: GlobalSettings
   setSettings: React.Dispatch<React.SetStateAction<GlobalSettings>>
+  /** null = superadmin (all tabs visible); array = staff with these permissions only */
+  permissions: AdminPermission[] | null
 }
 
 export function AdminView({
@@ -37,7 +41,9 @@ export function AdminView({
   setCategories,
   settings,
   setSettings,
+  permissions,
 }: Props) {
+  const can = (p: AdminPermission) => permissions === null || permissions.includes(p)
   const [activeTab, setActiveTab] = useState("jobs")
   const [filterJobId, setFilterJobId] = useState<string | null>(null)
   const [filterJobTitle, setFilterJobTitle] = useState<string | null>(null)
@@ -103,71 +109,106 @@ export function AdminView({
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6 flex h-auto w-full flex-wrap justify-start gap-1">
-          <TabsTrigger value="jobs">
-            <BriefcaseIcon data-icon="inline-start" />
-            משרות
-          </TabsTrigger>
-          <TabsTrigger value="categories">
-            <LayoutGridIcon data-icon="inline-start" />
-            קטגוריות
-          </TabsTrigger>
-          <TabsTrigger value="applications">
-            <InboxIcon data-icon="inline-start" />
-            פניות
-          </TabsTrigger>
-          <TabsTrigger value="settings">
-            <SettingsIcon data-icon="inline-start" />
-            הגדרות
-          </TabsTrigger>
-          <TabsTrigger value="nav">
-            <MenuIcon data-icon="inline-start" />
-            תפריט
-          </TabsTrigger>
-          <TabsTrigger value="users">
-            <Users data-icon="inline-start" />
-            משתמשים
-          </TabsTrigger>
+          {can("jobs") && (
+            <TabsTrigger value="jobs">
+              <BriefcaseIcon data-icon="inline-start" />
+              משרות
+            </TabsTrigger>
+          )}
+          {can("categories") && (
+            <TabsTrigger value="categories">
+              <LayoutGridIcon data-icon="inline-start" />
+              קטגוריות
+            </TabsTrigger>
+          )}
+          {can("applications") && (
+            <TabsTrigger value="applications">
+              <InboxIcon data-icon="inline-start" />
+              פניות
+            </TabsTrigger>
+          )}
+          {can("settings") && (
+            <TabsTrigger value="settings">
+              <SettingsIcon data-icon="inline-start" />
+              הגדרות
+            </TabsTrigger>
+          )}
+          {can("nav") && (
+            <TabsTrigger value="nav">
+              <MenuIcon data-icon="inline-start" />
+              תפריט
+            </TabsTrigger>
+          )}
+          {can("users") && (
+            <TabsTrigger value="users">
+              <Users data-icon="inline-start" />
+              משתמשים
+            </TabsTrigger>
+          )}
+          {permissions === null && (
+            <TabsTrigger value="staff">
+              <Users data-icon="inline-start" />
+              ניהול צוות
+            </TabsTrigger>
+          )}
         </TabsList>
 
-        <TabsContent value="jobs">
-          <JobsTab
-            jobs={jobs}
-            setJobs={setJobs}
-            categories={categories}
-            applications={applications}
-            onFilterByJob={handleFilterByJob}
-          />
-        </TabsContent>
-        <TabsContent value="categories">
-          <CategoriesTab
-            categories={categories}
-            setCategories={setCategories}
-            jobs={jobs}
-            setJobs={setJobs}
-          />
-        </TabsContent>
-        <TabsContent value="applications">
-          <ApplicationsTab
-            applications={applications}
-            loading={appsLoading}
-            onRefresh={fetchApplications}
-            filterJobId={filterJobId}
-            filterJobTitle={filterJobTitle}
-            onClearFilter={() => {
-              setFilterJobId(null)
-              setFilterJobTitle(null)
-            }}
-          />
-        </TabsContent>
-        <TabsContent value="settings">
-          <SettingsTab settings={settings} setSettings={setSettings} />
-        </TabsContent>
-        <TabsContent value="nav">
-          <NavTab settings={settings} setSettings={setSettings} />
-        </TabsContent>
-        <TabsContent value="users">
-          <UsersTab />
-        </TabsContent>
+        {can("jobs") && (
+          <TabsContent value="jobs">
+            <JobsTab
+              jobs={jobs}
+              setJobs={setJobs}
+              categories={categories}
+              applications={applications}
+              onFilterByJob={handleFilterByJob}
+            />
+          </TabsContent>
+        )}
+        {can("categories") && (
+          <TabsContent value="categories">
+            <CategoriesTab
+              categories={categories}
+              setCategories={setCategories}
+              jobs={jobs}
+              setJobs={setJobs}
+            />
+          </TabsContent>
+        )}
+        {can("applications") && (
+          <TabsContent value="applications">
+            <ApplicationsTab
+              applications={applications}
+              loading={appsLoading}
+              onRefresh={fetchApplications}
+              filterJobId={filterJobId}
+              filterJobTitle={filterJobTitle}
+              onClearFilter={() => {
+                setFilterJobId(null)
+                setFilterJobTitle(null)
+              }}
+            />
+          </TabsContent>
+        )}
+        {can("settings") && (
+          <TabsContent value="settings">
+            <SettingsTab settings={settings} setSettings={setSettings} />
+          </TabsContent>
+        )}
+        {can("nav") && (
+          <TabsContent value="nav">
+            <NavTab settings={settings} setSettings={setSettings} />
+          </TabsContent>
+        )}
+        {can("users") && (
+          <TabsContent value="users">
+            <UsersTab />
+          </TabsContent>
+        )}
+        {permissions === null && (
+          <TabsContent value="staff">
+            <StaffTab />
+          </TabsContent>
+        )}
       </Tabs>
     </main>
   )
