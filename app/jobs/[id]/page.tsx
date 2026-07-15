@@ -15,8 +15,8 @@ import {
   Clock,
   MapPin,
   MessageCircle,
-  Send,
 } from "lucide-react"
+import { ApplyButton } from "@/components/job-board/apply-button"
 
 export const runtime = "nodejs"
 // Render on every request so newly-added jobs never 404
@@ -253,15 +253,7 @@ export default async function JobPage({
                 </h3>
 
                 <div className="flex flex-col gap-2.5">
-                  {job.allowSiteApply && (
-                    <Link
-                      href="/"
-                      className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]"
-                    >
-                      <Send className="size-4" />
-                      הגש מועמדות באתר
-                    </Link>
-                  )}
+                  {job.allowSiteApply && <ApplyButton job={job} />}
                   {job.allowWhatsApp && (
                     <a
                       href={`https://wa.me/${job.whatsappNumber}?text=${encodeURIComponent(whatsappText)}`}
