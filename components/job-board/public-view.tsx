@@ -523,7 +523,7 @@ export function PublicView({
       {/* ══════════════════════════════════
           MAIN CONTENT
           ══════════════════════════════════ */}
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+      <main className="mx-auto max-w-6xl px-4 py-[clamp(3rem,8vw,6rem)]">
         {/* Filter bar */}
         <div className="mb-8 flex flex-wrap items-center gap-3 border-b border-border pb-6">
           <FilterSelect
@@ -651,7 +651,7 @@ export function PublicView({
       />
 
       {/* Employer CTA */}
-      <section className="border-t border-border bg-accent/30 py-10 text-center">
+      <section className="border-t border-border bg-accent/30 py-[clamp(3rem,6vw,5rem)] text-center">
         <div className="mx-auto max-w-xl px-4">
           <h2 className="font-heading text-2xl sm:text-3xl font-bold text-foreground">מגייסים?</h2>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -666,7 +666,7 @@ export function PublicView({
         </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center">
+      <footer className="border-t border-border py-[clamp(2.5rem,5vw,4rem)] text-center">
         <p className="mb-3 text-sm font-medium text-muted-foreground">
           ג&apos;וב <span className="text-amber-500">מוש</span> — לוח הדרושים המושלם בישראל
         </p>
