@@ -33,7 +33,7 @@ export function CategoryGrid({
         <div>
           <h2
             id="categories-heading"
-            className="font-heading text-xl font-bold text-foreground"
+            className="font-heading text-2xl sm:text-3xl font-bold text-foreground"
           >
             עיון לפי תחום
           </h2>
@@ -92,7 +92,7 @@ function CategoryCard({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "flex flex-col items-start gap-3 rounded-2xl border p-4 text-right transition-all duration-300",
+        "flex flex-col items-start gap-3 rounded-2xl border p-5 text-right transition-all duration-300",
         "snap-start shrink-0 w-[140px] min-h-[120px]",
         "sm:w-auto sm:shrink",
         active
