@@ -46,7 +46,7 @@ export function JobAlertsWidget() {
             <BellRing className="size-6" />
           </span>
           <div>
-            <h3 className="font-heading text-lg font-bold">
+            <h3 className="font-heading text-2xl sm:text-3xl font-bold">
               לא לפספס אף משרה
             </h3>
             <p className="mt-1 text-sm text-primary-foreground/75">

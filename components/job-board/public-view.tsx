@@ -383,7 +383,7 @@ export function PublicView({
           </div>
 
           {/* Main headline */}
-          <h1 className="text-balance text-center text-[clamp(1.875rem,5vw,3.5rem)] font-extrabold leading-tight text-white">
+          <h1 className="text-balance text-center text-3xl sm:text-[clamp(3rem,5vw,3.5rem)] font-extrabold leading-tight text-white">
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
               מצאו את{" "}<span className="inline-block whitespace-nowrap">ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span></span>{" "}
               <span className="inline-block whitespace-nowrap">ה<span className="relative inline-block">
