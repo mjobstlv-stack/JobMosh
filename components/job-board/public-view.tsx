@@ -383,7 +383,7 @@ export function PublicView({
           </div>
 
           {/* Main headline */}
-          <h1 className="text-balance text-center text-3xl font-extrabold leading-tight text-white sm:text-5xl">
+          <h1 className="text-balance text-center text-[clamp(1.875rem,5vw,3.5rem)] font-extrabold leading-tight text-white">
             <span className="hero-reveal inline-block" style={{ animationDelay: "0.2s" }}>
               מצאו את{" "}<span className="inline-block whitespace-nowrap">ה<span className="hero-word-pop text-amber-400 inline-block" style={{ animationDelay: "0.38s" }}>ג&apos;וב</span></span>{" "}
               <span className="inline-block whitespace-nowrap">ה<span className="relative inline-block">
@@ -567,7 +567,7 @@ export function PublicView({
               <div>
                 <h2
                   id="jobs-heading"
-                  className="font-heading text-xl font-bold text-foreground"
+                  className="font-heading text-2xl sm:text-3xl font-bold text-foreground"
                 >
                   משרות פתוחות
                 </h2>
@@ -653,7 +653,7 @@ export function PublicView({
       {/* Employer CTA */}
       <section className="border-t border-border bg-accent/30 py-10 text-center">
         <div className="mx-auto max-w-xl px-4">
-          <h2 className="font-heading text-xl font-bold text-foreground">מגייסים?</h2>
+          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-foreground">מגייסים?</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             פרסמו משרה בחינם בג&apos;וב מוש והגיעו למועמדים רלוונטיים דרך האתר, וואטסאפ, טלגרם ואינסטגרם.
           </p>
