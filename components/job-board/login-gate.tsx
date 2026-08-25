@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Briefcase, ChevronRight, Eye, EyeOff, Lock, User } from "lucide-react"
+import { ChevronRight, Eye, EyeOff, Lock, User } from "lucide-react"
+import { JobmoshMark } from "@/components/job-board/jobmosh-mark"
 import type { AdminPermission } from "@/lib/admin-staff"
 
 export type AuthInfo = { role: "superadmin" | "staff"; permissions: AdminPermission[] | null }
@@ -114,7 +115,7 @@ export function LoginGate({
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
           <div className="mb-4 flex size-16 items-center justify-center rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm">
-            <Briefcase className="size-8 text-white" />
+            <JobmoshMark className="size-8 text-white" />
           </div>
           <h1 className="text-2xl font-extrabold text-white">
             ג'וב<span className="text-amber-400">מוש</span>

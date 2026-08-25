@@ -34,7 +34,8 @@ import { JobDrawer } from "@/components/job-board/job-drawer"
 import { ApplyFormDialog } from "@/components/job-board/apply-form-dialog"
 import { LoginRegisterDialog } from "@/components/auth/login-register-dialog"
 import { cn } from "@/lib/utils"
-import { ArrowUp, Briefcase, ChevronDown, LogOut, Search, SearchX, User as UserIcon, X } from "lucide-react"
+import { JobmoshMark } from "@/components/job-board/jobmosh-mark"
+import { ArrowUp, ChevronDown, LogOut, Search, SearchX, User as UserIcon, X } from "lucide-react"
 import { FaInstagram, FaTelegram, FaFacebook } from "react-icons/fa"
 import type { PublicUser } from "@/lib/user-types"
 
@@ -260,7 +261,7 @@ export function PublicView({
           <div className="mb-12 flex items-center justify-between sm:mb-16">
             <div className="flex items-center gap-2.5 group">
               <span className="flex size-10 items-center justify-center rounded-xl border border-white/20 bg-white/15 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/25 group-hover:scale-110 group-hover:rotate-3">
-                <Briefcase className="size-5 text-white transition-transform duration-300 group-hover:scale-110" />
+                <JobmoshMark className="size-5 text-white transition-transform duration-300 group-hover:scale-110" />
               </span>
               <span className="font-heading text-xl font-extrabold text-white relative">
                 <span className="inline-block animate-[fadeSlideIn_0.5s_ease_both]">ג&apos;וב</span>
