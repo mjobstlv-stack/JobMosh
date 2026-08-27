@@ -260,15 +260,22 @@ export function PublicView({
           {/* Nav row */}
           <div className="mb-12 flex items-center justify-between sm:mb-16">
             <div className="flex items-center gap-2.5 group">
-              <span className="flex size-10 items-center justify-center rounded-xl border border-white/20 bg-white/15 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/25 group-hover:scale-110 group-hover:rotate-3">
+              <span className="relative flex size-10 items-center justify-center rounded-xl border border-white/20 bg-white/15 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/25 group-hover:scale-110 group-hover:rotate-3">
                 <JobmoshMark className="size-5 text-white transition-transform duration-300 group-hover:scale-110" />
+                {/* Brand-name badge, revealed from the icon's top-right corner on hover */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -top-6 -right-1 z-20 select-none whitespace-nowrap rounded-full border border-white/20 bg-white/15 px-2.5 py-1 text-[11px] font-bold text-amber-400 opacity-0 shadow-lg shadow-black/30 backdrop-blur-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:opacity-100"
+                >
+                  ג&apos;ובמוש
+                </span>
               </span>
               <span className="font-heading text-xl font-extrabold text-white relative">
-                <span className="inline-block animate-[fadeSlideIn_0.5s_ease_both]">ג&apos;וב</span>
+                <span className="inline-block animate-[fadeSlideIn_0.5s_ease_both]">מצא לך</span>{" "}
                 <span
                   className="relative inline-block text-amber-400 animate-[fadeSlideIn_0.5s_0.15s_ease_both_backwards]"
                 >
-                  מוש
+                  עבודה
                   {/* Animated underline glow */}
                   <span className="absolute -bottom-0.5 right-0 h-0.5 w-0 bg-amber-400/70 rounded-full transition-all duration-500 group-hover:w-full" />
                 </span>
