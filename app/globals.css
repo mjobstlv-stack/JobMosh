@@ -268,6 +268,13 @@ html.a11y-line-spacing li,
 html.a11y-line-spacing span,
 html.a11y-line-spacing div { line-height: 1.85 !important; }
 
+/* Contrast/grayscale scoped to page content only — NOT <html> — so the
+   accessibility menu's own `position: fixed` never breaks (a filter on an
+   ancestor creates a new containing block for fixed descendants). */
+html.a11y-high-contrast #a11y-scope { filter: contrast(1.5); }
+html.a11y-grayscale #a11y-scope { filter: grayscale(1); }
+html.a11y-high-contrast.a11y-grayscale #a11y-scope { filter: contrast(1.5) grayscale(1); }
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-6px); }

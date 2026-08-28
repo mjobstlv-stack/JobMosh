@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Heebo } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import { AccessibilityMenu } from '@/components/accessibility-menu'
+import { CookieNotice } from '@/components/cookie-notice'
 import './globals.css'
 
 const heebo = Heebo({
@@ -110,8 +111,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        {children}
+        <div id="a11y-scope">{children}</div>
         <AccessibilityMenu />
+        <CookieNotice />
         <Toaster position="top-center" richColors />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

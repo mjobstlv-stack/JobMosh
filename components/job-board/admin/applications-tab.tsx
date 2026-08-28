@@ -106,6 +106,7 @@ export function ApplicationsTab({
                     <TableHead className="text-right">משרה</TableHead>
                   )}
                   <TableHead className="text-right">טלפון</TableHead>
+                  <TableHead className="text-right">הודעה</TableHead>
                   <TableHead className="text-right">תאריך</TableHead>
                   <TableHead className="text-left">קו"ח</TableHead>
                 </TableRow>
@@ -123,6 +124,12 @@ export function ApplicationsTab({
                     )}
                     <TableCell dir="ltr" className="text-right text-muted-foreground">
                       {app.phone}
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[200px] truncate text-muted-foreground"
+                      title={app.message || undefined}
+                    >
+                      {app.message || "—"}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {formatHebrewDate(app.date)}

@@ -48,12 +48,8 @@ function applySettings(s: A11yState) {
   html.classList.toggle("a11y-no-animations", s.noAnimations)
   html.classList.toggle("a11y-highlight-focus", s.highlightFocus)
   html.classList.toggle("a11y-line-spacing", s.lineSpacing)
-
-  // Combine contrast + grayscale filters
-  const filters: string[] = []
-  if (s.highContrast) filters.push("contrast(1.5)")
-  if (s.grayscale) filters.push("grayscale(1)")
-  html.style.filter = filters.join(" ")
+  html.classList.toggle("a11y-high-contrast", s.highContrast)
+  html.classList.toggle("a11y-grayscale", s.grayscale)
 }
 
 // ── Toggle button ──────────────────────────────────────────────────────────

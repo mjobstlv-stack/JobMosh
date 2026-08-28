@@ -66,6 +66,9 @@ export default function AccessibilityPage() {
 
           <section>
             <h2 className="mb-3 text-lg font-semibold text-foreground">יצירת קשר בנושא נגישות</h2>
+            <p className="mb-2">
+              רכז/ת הנגישות מטעם האתר זמין/ה ליצירת קשר בכתובת המייל שלהלן.
+            </p>
             <p className="mb-2">נתקלתם בבעיית נגישות? נשמח לשמוע ולתקן:</p>
             <ul className="space-y-1">
               <li>
