@@ -3,7 +3,8 @@
 import { Card } from "@/components/ui/card"
 import { JobTags } from "@/components/job-board/job-tags"
 import { getCategoryIcon } from "@/lib/category-icons"
-import { cn, formatSalary, toPlainSummary } from "@/lib/utils"
+import { cn, formatSalary } from "@/lib/utils"
+import { toPreview } from "@/lib/job-text"
 import { formatHebrewDate, getJobSlug, type Category, type Job } from "@/lib/job-board-data"
 import Link from "next/link"
 import { ChevronLeft, ExternalLink, MessageCircle, Send } from "lucide-react"
@@ -76,7 +77,7 @@ export function JobCard({
       )}
 
       <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-        {toPlainSummary(job.description)}
+        {toPreview(job.description)}
       </p>
 
       {/* Footer: date + share + apply buttons */}

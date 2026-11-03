@@ -1,63 +1,23 @@
 import { Fragment } from "react"
-import { BULLET_RE, cn, stripBullet } from "@/lib/utils"
+import { cn } from "@/lib/utils"
+import { parseDescription } from "@/lib/job-text"
 
-type Block =
-  | { kind: "heading"; text: string }
-  | { kind: "paragraph"; lines: string[] }
-  | { kind: "list"; ordered: boolean; items: string[] }
-
-const ORDERED_RE = /^\s*\d{1,2}[.)]\s+/
-const MAX_HEADING_LENGTH = 40
-
-function isHeading(line: string): boolean {
-  return line.length <= MAX_HEADING_LENGTH && /[:：]$/.test(line)
-}
-
-/**
- * Turns the free text typed in the admin form into blocks:
- * blank line → new paragraph, "- item" / "1. item" → list, short "Title:" line → heading.
- */
-export function parseDescription(text: string): Block[] {
-  const blocks: Block[] = []
-  let current: Block | null = null
-
-  const flush = () => {
-    if (current) blocks.push(current)
-    current = null
-  }
-
-  for (const raw of text.replace(/\r\n?/g, "\n").split("\n")) {
-    const line = raw.trim()
-
-    if (!line) {
-      flush()
-      continue
-    }
-
-    if (BULLET_RE.test(line)) {
-      const ordered = ORDERED_RE.test(line)
-      if (current?.kind !== "list" || current.ordered !== ordered) {
-        flush()
-        current = { kind: "list", ordered, items: [] }
-      }
-      current.items.push(stripBullet(line))
-      continue
-    }
-
-    if (isHeading(line)) {
-      flush()
-      blocks.push({ kind: "heading", text: line.replace(/[:：]$/, "") })
-      continue
-    }
-
-    if (current?.kind !== "paragraph") {
-      flush()
-      current = { kind: "paragraph", lines: [] }
-    }
-    current.lines.push(line)
-  }
-  flush()
-  return blocks
+/** Renders **bold** segments as <strong>; any stray "**" is dropped. */
+export function InlineText({ text }: { text: string }) {
+  const parts = text.split(/\*\*(.+?)\*\*/g)
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <strong key={i} className="font-semibold text-foreground">
+            {part}
+          </strong>
+        ) : (
+          <Fragment key={i}>{part.replace(/\*\*/g, "")}</Fragment>
+        ),
+      )}
+    </>
+  )
 }
 
 export function JobDescription({
@@ -85,7 +45,7 @@ export function JobDescription({
                 size === "sm" ? "text-sm" : "text-base",
               )}
             >
-              {block.text}
+              <InlineText text={block.text} />
             </h4>
           )
         }
@@ -93,7 +53,7 @@ export function JobDescription({
         if (block.kind === "list") {
           const List = block.ordered ? "ol" : "ul"
           return (
-            <List key={i} className="flex flex-col gap-1.5">
+            <List key={i} className="flex flex-col gap-1">
               {block.items.map((item, j) => (
                 <li key={j} className="flex items-start gap-2.5">
                   {block.ordered ? (
@@ -104,7 +64,9 @@ export function JobDescription({
                       className={cn("size-1.5 shrink-0 rounded-full bg-primary", size === "sm" ? "mt-[11px]" : "mt-[13px]")}
                     />
                   )}
-                  <span>{item}</span>
+                  <span>
+                    <InlineText text={item} />
+                  </span>
                 </li>
               ))}
             </List>
@@ -116,7 +78,7 @@ export function JobDescription({
             {block.lines.map((line, j) => (
               <Fragment key={j}>
                 {j > 0 && <br />}
-                {line}
+                <InlineText text={line} />
               </Fragment>
             ))}
           </p>
