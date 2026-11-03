@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
+import { SITE_URL } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "מדיניות פרטיות",

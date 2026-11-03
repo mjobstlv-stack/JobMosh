@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site"
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { get, put } from "@vercel/blob"
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
           <tr><td style="padding: 6px 0; color: #666;">הודעה</td><td style="padding: 6px 0;">${message ? escHtml(message) : "—"}</td></tr>
         </table>
         <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;" />
-        <p style="color: #999; font-size: 12px;">נשלח דרך <a href="${process.env.NEXT_PUBLIC_SITE_URL ?? "https://jobmosh.co.il"}">jobmosh.co.il</a></p>
+        <p style="color: #999; font-size: 12px;">נשלח דרך <a href="${SITE_URL}">jobmosh.co.il</a></p>
       </div>
     `
 

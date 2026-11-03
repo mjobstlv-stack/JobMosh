@@ -155,6 +155,39 @@ function mergeOneLinersUnderHeadings(blocks: Block[]): Block[] {
   return out
 }
 
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+}
+
+function inlineHtml(text: string): string {
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*\*/g, "")
+}
+
+/**
+ * HTML for the JobPosting `description` field — Google renders basic tags
+ * (<p>, <ul>, <li>, <strong>, <br>) in its job listings. Requirements are appended
+ * so the posting is complete on Google's side.
+ */
+export function toJobPostingHtml(description: string, requirements: string[] = []): string {
+  const html = parseDescription(description).map((block) => {
+    if (block.kind === "heading") return `<p><strong>${inlineHtml(block.text)}</strong></p>`
+    if (block.kind === "list") {
+      const tag = block.ordered ? "ol" : "ul"
+      return `<${tag}>${block.items.map((i) => `<li>${inlineHtml(i)}</li>`).join("")}</${tag}>`
+    }
+    return `<p>${block.lines.map(inlineHtml).join("<br>")}</p>`
+  })
+
+  const reqs = requirements.map(stripBullet).filter((r) => r && !isSectionTitle(r))
+  if (reqs.length > 0) {
+    html.push("<p><strong>דרישות התפקיד</strong></p>")
+    html.push(`<ul>${reqs.map((r) => `<li>${inlineHtml(r)}</li>`).join("")}</ul>`)
+  }
+  return html.join("")
+}
+
 /** Plain, emoji-free text for previews and meta tags. */
 export function toPlainText(text: string): string {
   return stripMarkdown(text).replace(EMOJI_RE, "").replace(/\s+/g, " ").trim()

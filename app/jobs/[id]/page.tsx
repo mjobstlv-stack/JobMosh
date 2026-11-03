@@ -1,15 +1,15 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { getLiveJobs } from "@/lib/get-jobs"
+import { getLiveCategories, getLiveJobs } from "@/lib/get-jobs"
 import {
-  INITIAL_CATEGORIES,
   formatHebrewDate,
   getJobSlug,
   type Job,
 } from "@/lib/job-board-data"
 import { formatSalary } from "@/lib/utils"
-import { isSectionTitle, stripBullet, toPreview } from "@/lib/job-text"
+import { isSectionTitle, stripBullet, toJobPostingHtml, toPreview } from "@/lib/job-text"
+import { SITE_NAME } from "@/lib/site"
 import { InlineText, JobDescription } from "@/components/job-board/job-description"
 import {
   Briefcase,
@@ -27,8 +27,7 @@ export const dynamic = "force-dynamic"
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
+import { SITE_URL } from "@/lib/site"
 
 const EMPLOYMENT_TYPE: Record<string, string> = {
   "משרה מלאה": "FULL_TIME",
@@ -58,7 +57,8 @@ export async function generateMetadata({
   )
   if (!job) return {}
 
-  const title = `${job.title} | ${job.company} — ג'וב מוש`
+  // The root layout's title template already appends "| ג'וב מוש".
+  const title = `${job.title} · ${job.company} · ${job.city}`
   const description = `${job.title} ב${job.company}, ${job.city}. ${toPreview(job.description, 140).slice(0, 140)}...`
   const url = `${SITE_URL}/jobs/${getJobSlug(job)}`
 
@@ -72,10 +72,13 @@ export async function generateMetadata({
       url,
       type: "website",
       locale: "he_IL",
-      siteName: "ג'וב מוש",
+      siteName: SITE_NAME,
+      // A page-level openGraph replaces the layout's, so the share image must be repeated here.
+      images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: SITE_NAME }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
+      images: [`${SITE_URL}/og-image.png`],
       title,
       description,
     },
@@ -96,7 +99,7 @@ export default async function JobPage({
   )
   if (!job) notFound()
 
-  const categories = INITIAL_CATEGORIES.filter((c) =>
+  const categories = (await getLiveCategories()).filter((c) =>
     job.categoryIds.includes(c.id),
   )
 
@@ -108,13 +111,17 @@ export default async function JobPage({
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title: job.title,
-    description: job.description,
+    description: toJobPostingHtml(job.description, job.requirements),
     datePosted: job.postedAt,
-    validThrough: new Date(
-      new Date(job.postedAt).getTime() + 60 * 24 * 60 * 60 * 1000,
-    )
-      .toISOString()
-      .split("T")[0],
+    // No validThrough: jobs stay open until the admin archives them (archived jobs 404,
+    // which tells Google the posting is gone). A fixed "postedAt + N days" date made
+    // Google treat still-open jobs as expired and drop them from Google for Jobs.
+    url: `${SITE_URL}/jobs/${getJobSlug(job)}`,
+    identifier: {
+      "@type": "PropertyValue",
+      name: SITE_NAME,
+      value: job.id,
+    },
     hiringOrganization: {
       "@type": "Organization",
       name: job.company,

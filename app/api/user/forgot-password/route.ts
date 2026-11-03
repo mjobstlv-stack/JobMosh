@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site"
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { randomBytes } from "node:crypto"
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
   const token = randomBytes(32).toString("hex")
   await saveResetToken(token, user.id)
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jobmosh.co.il"
+  const siteUrl = SITE_URL
   const resend = new Resend(process.env.RESEND_API_KEY)
   const { error: sendError } = await resend.emails.send({
     from: process.env.RESEND_FROM ?? "onboarding@resend.dev",

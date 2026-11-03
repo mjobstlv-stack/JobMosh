@@ -6,8 +6,7 @@ export const runtime = "nodejs"
 // Revalidate once per hour — jobs change infrequently
 export const revalidate = 3600
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
+import { SITE_URL as BASE_URL } from "@/lib/site"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const jobs = await getLiveJobs()

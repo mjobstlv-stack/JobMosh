@@ -11,7 +11,7 @@ const heebo = Heebo({
   subsets: ['hebrew', 'latin'],
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.jobmosh.co.il"
+import { SITE_URL } from "@/lib/site"
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
