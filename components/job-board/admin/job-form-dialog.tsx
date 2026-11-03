@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { stripBullet } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import {
@@ -125,7 +126,7 @@ export function JobFormDialog({
 
     const requirements = requirementsText
       .split("\n")
-      .map((r) => r.trim())
+      .map(stripBullet)
       .filter(Boolean)
 
     const saved: Job = {
@@ -284,8 +285,8 @@ export function JobFormDialog({
                 id="job-desc"
                 value={draft.description}
                 onChange={(e) => set("description", e.target.value)}
-                placeholder="תארו את התפקיד, האחריות והסביבה..."
-                rows={3}
+                placeholder={"תיאור קצר של התפקיד והחברה.\n\nמה תעשו:\n- אחריות על...\n- עבודה מול...\n\nמה אנחנו מציעים:\n- ..."}
+                rows={8}
               />
             </Field>
 

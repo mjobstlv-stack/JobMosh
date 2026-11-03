@@ -8,7 +8,8 @@ import {
   getJobSlug,
   type Job,
 } from "@/lib/job-board-data"
-import { formatSalary } from "@/lib/utils"
+import { formatSalary, stripBullet, toPlainSummary } from "@/lib/utils"
+import { JobDescription } from "@/components/job-board/job-description"
 import {
   Briefcase,
   Building2,
@@ -57,7 +58,7 @@ export async function generateMetadata({
   if (!job) return {}
 
   const title = `${job.title} | ${job.company} — ג'וב מוש`
-  const description = `${job.title} ב${job.company}, ${job.city}. ${job.description.slice(0, 140)}...`
+  const description = `${job.title} ב${job.company}, ${job.city}. ${toPlainSummary(job.description).slice(0, 140)}...`
   const url = `${SITE_URL}/jobs/${getJobSlug(job)}`
 
   return {
@@ -219,9 +220,7 @@ export default async function JobPage({
                 <h2 className="mb-3 font-heading text-lg font-bold text-foreground">
                   תיאור המשרה
                 </h2>
-                <p className="leading-relaxed text-muted-foreground">
-                  {job.description}
-                </p>
+                <JobDescription text={job.description} size="base" />
               </section>
 
               <section className="rounded-2xl border border-border bg-card p-6">
@@ -235,7 +234,7 @@ export default async function JobPage({
                       className="flex items-start gap-2.5 text-sm text-muted-foreground"
                     >
                       <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-                      {req}
+                      {stripBullet(req)}
                     </li>
                   ))}
                 </ul>

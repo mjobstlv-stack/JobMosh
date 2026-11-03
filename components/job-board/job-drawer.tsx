@@ -14,7 +14,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { JobTags } from "@/components/job-board/job-tags"
 import { ApplyFormContent } from "@/components/job-board/apply-form-content"
 import { getCategoryIcon } from "@/lib/category-icons"
-import { cn } from "@/lib/utils"
+import { JobDescription } from "@/components/job-board/job-description"
+import { cn, stripBullet } from "@/lib/utils"
 import {
   formatHebrewDate,
   type Application,
@@ -104,7 +105,7 @@ export function JobDrawer({
     <div className="flex flex-col gap-6 p-5">
       <section>
         <h3 className="font-heading text-sm font-semibold text-foreground">תיאור המשרה</h3>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{job.description}</p>
+        <JobDescription text={job.description} size="sm" className="mt-2" />
       </section>
 
       <section>
@@ -113,7 +114,7 @@ export function JobDrawer({
           {job.requirements.map((req, i) => (
             <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
               <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-              <span>{req}</span>
+              <span>{stripBullet(req)}</span>
             </li>
           ))}
         </ul>
