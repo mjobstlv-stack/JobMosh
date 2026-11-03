@@ -10,6 +10,7 @@ import {
 import { formatSalary } from "@/lib/utils"
 import { isSectionTitle, stripBullet, toJobPostingHtml, toPreview } from "@/lib/job-text"
 import { SITE_NAME } from "@/lib/site"
+import { categoryUrl, cityUrl, normalizeCity, toSlug } from "@/lib/landing-pages"
 import { InlineText, JobDescription } from "@/components/job-board/job-description"
 import {
   Briefcase,
@@ -55,7 +56,8 @@ export async function generateMetadata({
   const job: Job | undefined = jobs.find(
     (j) => (getJobSlug(j) === id || j.id === id) && j.status === "active"
   )
-  if (!job) return {}
+  // Throwing here (not just in the page) makes the response a real 404 before streaming starts.
+  if (!job) notFound()
 
   // The root layout's title template already appends "| ג'וב מוש".
   const title = `${job.title} · ${job.company} · ${job.city}`
@@ -198,10 +200,21 @@ export default async function JobPage({
                     <Building2 className="size-3.5" />
                     {job.company}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin className="size-3.5" />
-                    {job.city}
-                  </span>
+                  {job.workModel !== "מהבית" && job.city?.trim() ? (
+                    <Link
+                      href={cityUrl(toSlug(normalizeCity(job.city)))}
+                      className="flex items-center gap-1 transition-colors hover:text-primary"
+                      title={`עוד משרות ב${normalizeCity(job.city)}`}
+                    >
+                      <MapPin className="size-3.5" />
+                      {job.city}
+                    </Link>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <MapPin className="size-3.5" />
+                      {job.city}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1">
                     <Clock className="size-3.5" />
                     {formatHebrewDate(job.postedAt)}
@@ -284,12 +297,13 @@ export default async function JobPage({
                     <p className="mb-2 text-xs text-muted-foreground">תחומים</p>
                     <div className="flex flex-wrap gap-1.5">
                       {categories.map((c) => (
-                        <span
+                        <Link
                           key={c.id}
-                          className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground"
+                          href={categoryUrl(toSlug(c.name))}
+                          className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
                         >
                           {c.name}
-                        </span>
+                        </Link>
                       ))}
                     </div>
                   </div>
