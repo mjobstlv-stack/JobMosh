@@ -31,8 +31,19 @@ try {
     gtag('consent', 'update', { analytics_storage: 'granted' });
   }
 } catch (e) {}
+// Never send credentials to Google: GA is switched off entirely on the password-reset
+// page (its URL carries ?token=), and secret-looking query params are stripped elsewhere.
+if (/^\\/reset-password/.test(location.pathname)) {
+  window['ga-disable-' + ${JSON.stringify(GA_MEASUREMENT_ID)}] = true;
+}
+var cleanUrl = location.href;
+try {
+  var u = new URL(location.href);
+  ['token', 'code', 'key', 'email', 'password'].forEach(function (p) { u.searchParams.delete(p); });
+  cleanUrl = u.toString();
+} catch (e) {}
 gtag('js', new Date());
-gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});
+gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)}, { page_location: cleanUrl });
 `
 
 export const metadata: Metadata = {
