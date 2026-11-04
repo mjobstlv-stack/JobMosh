@@ -1,5 +1,6 @@
 "use client"
 
+import { trackEvent } from "@/lib/analytics"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import {
@@ -130,6 +131,13 @@ export function PublicView({
       drawerHistoryRef.current = true
     }
     setActiveJob(job)
+    // The drawer doesn't change the URL, so GA would not see a page_view per job.
+    trackEvent("job_view", {
+      job_id: job.id,
+      job_title: job.title,
+      job_company: job.company,
+      job_city: job.city,
+    })
   }
 
   function closeDrawer() {

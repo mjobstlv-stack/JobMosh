@@ -19,6 +19,7 @@ export type AnalyticsEvent =
   | "employer_contact" // ★ employer clicked "publish a job" (mailto)
   | "sign_up" // ★ candidate account created
   | "job_alert_signup" // job-alerts widget submitted
+  | "job_view" // job opened in the homepage drawer (job pages get a normal page_view)
   | "login"
   | "contact_email"
   | "phone_click"
