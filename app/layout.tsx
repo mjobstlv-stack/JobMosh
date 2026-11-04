@@ -11,7 +11,29 @@ const heebo = Heebo({
   subsets: ['hebrew', 'latin'],
 })
 
-import { SITE_URL } from "@/lib/site"
+import { ANALYTICS_CONSENT_KEY, GA_MEASUREMENT_ID, SITE_URL } from "@/lib/site"
+
+// Runs before gtag.js loads. Consent defaults to denied (Consent Mode v2); a returning
+// visitor who already accepted in the cookie notice is upgraded immediately.
+// Built only from our own constants (JSON-encoded), so it is safe to inline.
+const GTAG_BOOTSTRAP = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+window.gtag = gtag;
+gtag('consent', 'default', {
+  analytics_storage: 'denied',
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied'
+});
+try {
+  if (localStorage.getItem(${JSON.stringify(ANALYTICS_CONSENT_KEY)}) === '"granted"') {
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+  }
+} catch (e) {}
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)});
+`
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -109,6 +131,13 @@ export default function RootLayout({
             __html: JSON.stringify(jsonLdWebSite).replace(/</g, "\\u003c"),
           }}
         />
+        {process.env.NODE_ENV === 'production' && (
+          <>
+            {/* Google tag (gtag.js) with Consent Mode — no analytics cookies until the visitor accepts. */}
+            <script dangerouslySetInnerHTML={{ __html: GTAG_BOOTSTRAP }} />
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} />
+          </>
+        )}
       </head>
       <body className="font-sans antialiased">
         <div id="a11y-scope">{children}</div>

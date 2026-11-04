@@ -10,3 +10,9 @@ export const SITE_URL = RAW_SITE_URL.replace(/\/+$/, "").replace(
 )
 
 export const SITE_NAME = "ג'וב מוש"
+
+/** Google Analytics 4 measurement ID (GA → Admin → Data streams). */
+export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? "G-65FXV5VPRF"
+
+/** localStorage key holding the visitor's analytics choice: JSON "granted" | "denied". */
+export const ANALYTICS_CONSENT_KEY = "jm_analytics_consent"

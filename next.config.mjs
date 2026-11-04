@@ -4,18 +4,24 @@ const isDev = process.env.NODE_ENV !== "production"
 
 // In dev, Turbopack + React require 'unsafe-eval' for HMR and call-stack reconstruction.
 // In production, React never calls eval(), so we keep the policy strict.
+// Google Analytics 4 (gtag.js) hosts, per Google's CSP guide for GA4.
+const GA_SCRIPT = "https://*.googletagmanager.com"
+// The *.google.com / doubleclick / google.co.il hosts are used when Google signals is on.
+const GA_CONNECT =
+  "https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com https://*.google.co.il"
+
 const scriptSrc = isDev
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-  : "script-src 'self' 'unsafe-inline'"
+  ? `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${GA_SCRIPT}`
+  : `script-src 'self' 'unsafe-inline' ${GA_SCRIPT}`
 
 const ContentSecurityPolicy = [
   "default-src 'self'",
   scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com",
-  // Allow same-origin + Blob CDN (CV previews) + Vercel Analytics
-  "connect-src 'self' https://*.public.blob.vercel-storage.com https://vitals.vercel-insights.com",
+  `img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://*.google-analytics.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com https://*.google.co.il`,
+  // Allow same-origin + Blob CDN (CV previews) + Vercel Analytics + Google Analytics
+  `connect-src 'self' https://*.public.blob.vercel-storage.com https://vitals.vercel-insights.com ${GA_CONNECT}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

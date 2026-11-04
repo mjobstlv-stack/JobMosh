@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
 import { SITE_URL } from "@/lib/site"
+import { CookieSettingsButton } from "@/components/cookie-settings-button"
 
 export const metadata: Metadata = {
   title: "מדיניות פרטיות",
@@ -36,7 +37,7 @@ export default function PrivacyPage() {
 
       <main className="mx-auto max-w-3xl px-4 py-12">
         <h1 className="mb-2 text-3xl font-bold text-foreground">מדיניות פרטיות</h1>
-        <p className="mb-10 text-sm text-muted-foreground">עדכון אחרון: יולי 2026</p>
+        <p className="mb-10 text-sm text-muted-foreground">עדכון אחרון: נובמבר 2026</p>
 
         <div className="space-y-8 text-base leading-relaxed text-foreground">
           <Section title="1. כללי">
@@ -114,9 +115,27 @@ export default function PrivacyPage() {
             <p className="mt-3">
               בנוסף, האתר עושה שימוש בשירות Vercel Analytics לאיסוף נתונים סטטיסטיים אנונימיים
               על השימוש באתר (כגון עמודים נצפים ומספר מבקרים), לשם שיפור השירות. שירות זה אינו
-              משתמש בעוגיות מזהות ואינו אוסף מידע מזהה אישית. איננו עושים שימוש בעוגיות פרסום או
-              מעקב של צד שלישי.
+              משתמש בעוגיות מזהות ואינו אוסף מידע מזהה אישית.
             </p>
+            <p className="mt-3">
+              <strong>Google Analytics:</strong> רק אם אישרת זאת בהודעת העוגיות, האתר מפעיל את שירות
+              Google Analytics של חברת Google, למדידת השימוש באתר ולשיפורו. במקרה זה נשמרות בדפדפן
+              עוגיות (_ga ו-_ga_*) לתקופה של עד שנתיים, ונאספים נתונים כגון העמודים שנצפו, משך
+              הביקור, סוג המכשיר והדפדפן ומיקום גאוגרפי משוער (ברמת עיר). Google משמשת כמעבדת מידע
+              עבורנו, והמידע עשוי להישמר בשרתים מחוץ לישראל. כל עוד לא אישרת, השירות פועל ללא עוגיות
+              וללא מזהים אישיים. מידע נוסף{" "}
+              <a
+                href="https://policies.google.com/privacy?hl=iw"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                במדיניות הפרטיות של Google
+              </a>
+              . איננו משתמשים בעוגיות פרסום.
+            </p>
+            <p className="mt-3">ניתן לשנות את בחירתך בכל עת:</p>
+            <CookieSettingsButton />
           </Section>
 
           <Section title="8. זכויותיך">
