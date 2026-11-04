@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import type { ReactNode } from "react"
 import { SITE_URL } from "@/lib/site"
+import { CookieSettingsLink } from "@/components/cookie-settings-button"
 
 export type Crumb = { name: string; href: string }
 
@@ -91,6 +92,7 @@ export function LandingShell({
             <Link href="/" className="hover:text-muted-foreground">דף הבית</Link>
             <Link href="/jobs" className="hover:text-muted-foreground">משרות לפי עיר ותחום</Link>
             <Link href="/about" className="hover:text-muted-foreground">אודות</Link>
+            <CookieSettingsLink className="hover:text-muted-foreground" />
           </div>
           <p className="mt-3">© {new Date().getFullYear()} ג&apos;וב מוש</p>
         </footer>

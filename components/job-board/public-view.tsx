@@ -38,6 +38,7 @@ import { JobmoshMark } from "@/components/job-board/jobmosh-mark"
 import { ArrowUp, ChevronDown, LogOut, Search, SearchX, User as UserIcon, X } from "lucide-react"
 import { FaInstagram, FaTelegram, FaFacebook } from "react-icons/fa"
 import type { PublicUser } from "@/lib/user-types"
+import { CookieSettingsLink } from "@/components/cookie-settings-button"
 
 const SOCIAL_LINKS = [
   { href: "https://www.instagram.com/mjobstlv", icon: FaInstagram, label: "אינסטגרם", color: "hover:text-pink-400" },
@@ -712,6 +713,7 @@ export function PublicView({
           <a href="/accessibility" className="transition-colors hover:text-muted-foreground">
             נגישות
           </a>
+          <CookieSettingsLink className="transition-colors hover:text-muted-foreground" />
           <button
             onClick={onSwitchToAdmin}
             className="text-muted-foreground/30 hover:text-muted-foreground/70 transition-colors select-none text-base leading-none"

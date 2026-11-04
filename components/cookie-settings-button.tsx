@@ -13,3 +13,12 @@ export function CookieSettingsButton() {
     </button>
   )
 }
+
+/** Footer-sized variant: styled by the caller to match neighbouring footer links. */
+export function CookieSettingsLink({ className }: { className?: string }) {
+  return (
+    <button type="button" onClick={resetCookieConsent} className={className}>
+      הגדרות עוגיות
+    </button>
+  )
+}

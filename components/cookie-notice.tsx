@@ -14,8 +14,38 @@ declare global {
   }
 }
 
-/** Clears the stored choice and reloads, so the notice asks again (used by the privacy page). */
+/** Removes Google Analytics cookies (_ga, _ga_<id>) on every domain variant they may be set on. */
+function deleteAnalyticsCookies() {
+  const names = document.cookie
+    .split(";")
+    .map((c) => c.split("=")[0].trim())
+    .filter((n) => n === "_ga" || n.startsWith("_ga_"))
+  const host = window.location.hostname
+  const domains = ["", host, `.${host}`, `.${host.replace(/^www\./, "")}`]
+  for (const name of names) {
+    for (const domain of domains) {
+      document.cookie = `${name}=; max-age=0; path=/${domain ? `; domain=${domain}` : ""}`
+    }
+  }
+}
+
+/**
+ * Pushes the visitor's choice to Google Consent Mode v2. Only analytics is ever
+ * granted — the site runs no ads, so the three ad signals always stay denied.
+ */
+function applyConsent(choice: "granted" | "denied") {
+  window.gtag?.("consent", "update", {
+    analytics_storage: choice,
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+  })
+  if (choice === "denied") deleteAnalyticsCookies()
+}
+
+/** Withdraws consent, clears the stored choice and reloads so the notice asks again. */
 export function resetCookieConsent() {
+  applyConsent("denied")
   try {
     localStorage.removeItem(ANALYTICS_CONSENT_KEY)
   } catch {}
@@ -32,12 +62,12 @@ export function CookieNotice() {
 
   function accept() {
     setConsent("granted")
-    // Google Consent Mode: the tag in <head> starts with analytics_storage denied.
-    window.gtag?.("consent", "update", { analytics_storage: "granted" })
+    applyConsent("granted")
   }
 
   function decline() {
     setConsent("denied")
+    applyConsent("denied")
   }
 
   return (

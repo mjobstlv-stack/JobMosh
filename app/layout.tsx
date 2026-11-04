@@ -24,8 +24,10 @@ gtag('consent', 'default', {
   analytics_storage: 'denied',
   ad_storage: 'denied',
   ad_user_data: 'denied',
-  ad_personalization: 'denied'
+  ad_personalization: 'denied',
+  wait_for_update: 500
 });
+gtag('set', 'ads_data_redaction', true);
 try {
   if (localStorage.getItem(${JSON.stringify(ANALYTICS_CONSENT_KEY)}) === '"granted"') {
     gtag('consent', 'update', { analytics_storage: 'granted' });
