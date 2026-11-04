@@ -1,6 +1,6 @@
 "use client"
 
-import { trackEvent } from "@/lib/analytics"
+import { jobParams, trackEvent } from "@/lib/analytics"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -44,6 +44,11 @@ export function ApplyFormContent({
   const [selectedProfile, setSelectedProfile] = useState<UserProfile | null>(null)
   const [saving, setSaving] = useState(false)
   const prefilled = useRef(false)
+
+  // Funnel step: the form only mounts when the candidate actually opens it.
+  useEffect(() => {
+    trackEvent("apply_start", { ...jobParams(job), method: "site_form" })
+  }, [job])
 
   // Pre-fill name/phone from user account (once)
   useEffect(() => {
@@ -101,10 +106,8 @@ export function ApplyFormContent({
         return
       }
       trackEvent("generate_lead", {
+        ...jobParams(job),
         method: "site_form",
-        job_id: job.id,
-        job_title: job.title,
-        job_company: job.company,
         with_cv: cvFile || selectedProfile?.cvPath ? "yes" : "no",
       })
       onSuccess({

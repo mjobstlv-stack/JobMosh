@@ -56,8 +56,17 @@ try {
   ['token', 'code', 'key', 'email', 'password', 'jm_internal'].forEach(function (p) { u.searchParams.delete(p); });
   cleanUrl = u.toString();
 } catch (e) {}
+// Page type for GA's "Content group" dimension — mirrors contentGroupFor() in lib/analytics.ts
+// (kept inline because it must be set before the first page_view, ahead of hydration).
+var jmPath = location.pathname, contentGroup = 'info';
+if (jmPath === '/') contentGroup = 'home';
+else if (jmPath.indexOf('/jobs/city/') === 0) contentGroup = 'landing_city';
+else if (jmPath.indexOf('/jobs/category/') === 0) contentGroup = 'landing_category';
+else if (jmPath === '/jobs') contentGroup = 'jobs_index';
+else if (jmPath.indexOf('/jobs/') === 0) contentGroup = 'job_page';
+else if (jmPath.indexOf('/profile') === 0) contentGroup = 'profile';
 gtag('js', new Date());
-gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)}, { page_location: cleanUrl });
+gtag('config', ${JSON.stringify(GA_MEASUREMENT_ID)}, { page_location: cleanUrl, content_group: contentGroup });
 `
 
 export const metadata: Metadata = {

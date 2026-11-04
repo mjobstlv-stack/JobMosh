@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
-import { trackEvent } from "@/lib/analytics"
+import { usePathname } from "next/navigation"
+import { cachedJobParams, contentGroupFor, trackEvent } from "@/lib/analytics"
 
 /**
  * One delegated click listener for outbound contact links (WhatsApp, mailto, tel)
@@ -10,6 +11,18 @@ import { trackEvent } from "@/lib/analytics"
  * the page it was clicked on (GA adds page_location itself).
  */
 export function AnalyticsLinkTracker() {
+  const pathname = usePathname()
+
+  // Keep content_group in step with client-side navigations, so events fired on a page
+  // (job_view, generate_lead…) carry that page's type. The first load sets it in layout.tsx.
+  useEffect(() => {
+    try {
+      window.gtag?.("set", { content_group: contentGroupFor(pathname) })
+    } catch {
+      // Analytics must never break the UI.
+    }
+  }, [pathname])
+
   useEffect(() => {
     function onClick(e: MouseEvent) {
       const target = e.target as Element | null
@@ -20,9 +33,10 @@ export function AnalyticsLinkTracker() {
 
       if (/^https?:\/\/(wa\.me|api\.whatsapp\.com)\//i.test(href)) {
         trackEvent("whatsapp_click", {
-          link_location: link.dataset.trackLocation ?? "link",
           job_id: link.dataset.jobId,
           job_title: link.dataset.jobTitle,
+          ...cachedJobParams(link.dataset.jobId),
+          link_location: link.dataset.trackLocation ?? "link",
         })
       } else if (href.startsWith("mailto:")) {
         const subject = decodeURIComponent(href.split("subject=")[1] ?? "")

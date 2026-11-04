@@ -1,6 +1,6 @@
 "use client"
 
-import { trackEvent } from "@/lib/analytics"
+import { jobParams, registerCategories, trackEvent } from "@/lib/analytics"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import {
@@ -132,12 +132,7 @@ export function PublicView({
     }
     setActiveJob(job)
     // The drawer doesn't change the URL, so GA would not see a page_view per job.
-    trackEvent("job_view", {
-      job_id: job.id,
-      job_title: job.title,
-      job_company: job.company,
-      job_city: job.city,
-    })
+    trackEvent("job_view", { ...jobParams(job), view_source: "drawer" })
   }
 
   function closeDrawer() {
@@ -226,6 +221,42 @@ export function PublicView({
       return true
     })
   }, [jobs, selectedCategory, regions, jobType, workModel, query])
+
+  // Lets jobParams() report category names instead of ids.
+  useEffect(() => {
+    registerCategories(categories)
+  }, [categories])
+
+  // What candidates search for, and how many results they got — 0 results = demand
+  // with no supply (jobs worth sourcing / pages worth writing). Debounced so typing
+  // "מתכנת" sends one event, not six.
+  const resultsCount = filtered.length
+  useEffect(() => {
+    const term = query.trim()
+    if (term.length < 2) return
+    const t = setTimeout(() => trackEvent("search", { search_term: term, results_count: resultsCount }), 1500)
+    return () => clearTimeout(t)
+  }, [query, resultsCount])
+
+  const filterKey = [regions.join("|"), jobType, workModel, selectedCategory ?? ""].join("§")
+  const firstFilterRun = useRef(true)
+  useEffect(() => {
+    if (firstFilterRun.current) {
+      firstFilterRun.current = false
+      return
+    }
+    const t = setTimeout(() => {
+      trackEvent("filter_jobs", {
+        filter_region: regions.join(", ") || "הכל",
+        filter_job_type: jobType === ALL ? "הכל" : jobType,
+        filter_work_model: workModel === ALL ? "הכל" : workModel,
+        filter_category: selectedCategoryName ?? "הכל",
+        results_count: resultsCount,
+      })
+    }, 800)
+    return () => clearTimeout(t)
+    // filterKey captures every filter; the rest are read at fire time.
+  }, [filterKey])
 
   const hasFilters =
     query.trim() !== "" ||

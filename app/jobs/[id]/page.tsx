@@ -21,6 +21,8 @@ import {
   MessageCircle,
 } from "lucide-react"
 import { ApplyButton } from "@/components/job-board/apply-button"
+import { JobViewTracker } from "@/components/job-board/job-view-tracker"
+import { toAnalyticsJob } from "@/lib/analytics"
 
 export const runtime = "nodejs"
 // Render on every request so newly-added jobs never 404
@@ -38,11 +40,9 @@ const EMPLOYMENT_TYPE: Record<string, string> = {
   סטודנטים: "PART_TIME",
 }
 
-const JOB_LOCATION_TYPE: Record<string, string | undefined> = {
-  מהמשרד: undefined,
-  היברידי: "HYBRID",
-  מהבית: "TELECOMMUTE",
-}
+// Google for Jobs accepts only "TELECOMMUTE" here (there is no HYBRID value) and requires
+// applicantLocationRequirements alongside it. Hybrid jobs are listed by their office location.
+const isRemote = (job: Job) => job.workModel === "מהבית"
 
 // ── Next.js route exports ───────────────────────────────────────────────────
 
@@ -105,7 +105,6 @@ export default async function JobPage({
     job.categoryIds.includes(c.id),
   )
 
-  const locationType = JOB_LOCATION_TYPE[job.workModel]
   const whatsappText = `היי, אני מעוניין/ת להגיש מועמדות למשרת ${job.title} ב${job.company} שפורסמה בג'וב מוש. אשמח לפרטים נוספים.`
 
   // JSON-LD — Google Jobs rich result
@@ -128,16 +127,25 @@ export default async function JobPage({
       "@type": "Organization",
       name: job.company,
     },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: job.city,
-        addressCountry: "IL",
-      },
-    },
+    // Fully remote jobs have no office ("מרחוק" is not a place), so Google gets the
+    // country requirement instead of a fake address.
+    ...(isRemote(job)
+      ? {
+          jobLocationType: "TELECOMMUTE",
+          applicantLocationRequirements: { "@type": "Country", name: "Israel" },
+        }
+      : {
+          jobLocation: {
+            "@type": "Place",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: normalizeCity(job.city),
+              ...(job.region ? { addressRegion: job.region } : {}),
+              addressCountry: "IL",
+            },
+          },
+        }),
     employmentType: EMPLOYMENT_TYPE[job.jobType] ?? "OTHER",
-    ...(locationType ? { jobLocationType: locationType } : {}),
     directApply: job.allowSiteApply,
     ...(job.salary && job.salary.type !== "undisclosed"
       ? {
@@ -156,6 +164,31 @@ export default async function JobPage({
       : {}),
   }
 
+  // Breadcrumb trail for Google results: home › field (or city) landing page › job.
+  // The admin's first-picked category is the job's main field.
+  const primaryCategory = categories.find((c) => c.id === job.categoryIds[0]) ?? categories[0]
+  const middleCrumb = primaryCategory
+    ? { name: `דרושים ב${primaryCategory.name}`, href: categoryUrl(toSlug(primaryCategory.name)) }
+    : !isRemote(job) && job.city?.trim()
+      ? { name: `דרושים ב${normalizeCity(job.city)}`, href: cityUrl(toSlug(normalizeCity(job.city))) }
+      : null
+  const crumbs = [
+    { name: "דף הבית", href: "/" },
+    ...(middleCrumb ? [middleCrumb] : []),
+    { name: job.title, href: `/jobs/${getJobSlug(job)}` },
+  ]
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      // Same URL form as the landing pages' breadcrumbs (components/landing/landing-shell.tsx).
+      item: `${SITE_URL}${c.href === "/" ? "" : c.href}`,
+    })),
+  }
+
   return (
     <>
       {/* JSON-LD structured data for Google Jobs */}
@@ -163,6 +196,12 @@ export default async function JobPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }}
+      />
+
+      <JobViewTracker job={toAnalyticsJob(job)} categories={categories} />
 
       <div className="min-h-screen bg-background" dir="rtl">
         {/* Slim top bar */}
