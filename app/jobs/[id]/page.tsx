@@ -281,6 +281,9 @@ export default async function JobPage({
                   {job.allowSiteApply && <ApplyButton job={job} />}
                   {job.allowWhatsApp && (
                     <a
+                      data-track-location="job_page"
+                      data-job-id={job.id}
+                      data-job-title={job.title}
                       href={`https://wa.me/${job.whatsappNumber}?text=${encodeURIComponent(whatsappText)}`}
                       target="_blank"
                       rel="noopener noreferrer"

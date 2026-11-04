@@ -1,5 +1,6 @@
 "use client"
 
+import { trackEvent } from "@/lib/analytics"
 import { useEffect, useState } from "react"
 import { Drawer } from "vaul"
 import {
@@ -70,6 +71,7 @@ export function JobDrawer({
 
   function handleWhatsApp() {
     if (!job) return
+    trackEvent("whatsapp_click", { link_location: "job_drawer", job_id: job.id, job_title: job.title })
     const template = `היי, אני מעוניין/ת להגיש מועמדות למשרת ${job.title} באזור ${job.region} שפורסמה באתר שלך. אשמח לקבל פרטים נוספים.`
     const url = `https://wa.me/${job.whatsappNumber}?text=${encodeURIComponent(template)}`
     window.open(url, "_blank", "noopener,noreferrer")

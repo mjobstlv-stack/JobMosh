@@ -1,5 +1,6 @@
 "use client"
 
+import { markInternalTraffic } from "@/lib/analytics"
 import { useEffect, useState } from "react"
 import { ChevronRight, Eye, EyeOff, Lock, User } from "lucide-react"
 import { JobmoshMark } from "@/components/job-board/jobmosh-mark"
@@ -34,7 +35,8 @@ export function LoginGate({
             role: data.role ?? "superadmin",
             permissions: data.role === "staff" ? (data.permissions ?? []) : null,
           })
-          setAuth("ok")
+          markInternalTraffic()
+        setAuth("ok")
         } else {
           setAuth("no")
         }
@@ -61,6 +63,7 @@ export function LoginGate({
           role: data.role ?? "superadmin",
           permissions: data.role === "staff" ? (data.permissions ?? []) : null,
         })
+        markInternalTraffic()
         setAuth("ok")
       } else {
         const data = await res.json().catch(() => ({}))

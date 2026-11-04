@@ -1,5 +1,6 @@
 "use client"
 
+import { trackEvent } from "@/lib/analytics"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -99,6 +100,13 @@ export function ApplyFormContent({
         setSaving(false)
         return
       }
+      trackEvent("generate_lead", {
+        method: "site_form",
+        job_id: job.id,
+        job_title: job.title,
+        job_company: job.company,
+        with_cv: cvFile || selectedProfile?.cvPath ? "yes" : "no",
+      })
       onSuccess({
         id: `app-${Date.now()}`,
         jobId: job.id,

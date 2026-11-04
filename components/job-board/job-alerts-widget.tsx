@@ -1,5 +1,6 @@
 "use client"
 
+import { trackEvent } from "@/lib/analytics"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -26,6 +27,7 @@ export function JobAlertsWidget() {
       toast.error("יש לאשר קבלת התראות כדי להירשם")
       return
     }
+    trackEvent("job_alert_signup")
     toast.success("נרשמתם בהצלחה!", {
       description: "נעדכן אתכם במשרות חדשות שמתאימות לכם.",
     })

@@ -4,6 +4,7 @@ import { Heebo } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 import { AccessibilityMenu } from '@/components/accessibility-menu'
 import { CookieNotice } from '@/components/cookie-notice'
+import { AnalyticsLinkTracker } from '@/components/analytics-link-tracker'
 import './globals.css'
 
 const heebo = Heebo({
@@ -12,6 +13,7 @@ const heebo = Heebo({
 })
 
 import { ANALYTICS_CONSENT_KEY, GA_MEASUREMENT_ID, SITE_URL } from "@/lib/site"
+import { INTERNAL_TRAFFIC_KEY } from "@/lib/analytics"
 
 // Runs before gtag.js loads. Consent defaults to denied (Consent Mode v2); a returning
 // visitor who already accepted in the cookie notice is upgraded immediately.
@@ -38,10 +40,20 @@ try {
 if (/^\\/reset-password/.test(location.pathname)) {
   window['ga-disable-' + ${JSON.stringify(GA_MEASUREMENT_ID)}] = true;
 }
+// Owner/staff traffic is excluded from GA: any admin login sets the flag, and
+// ?jm_internal=1 / ?jm_internal=0 turns it on/off on any device (e.g. your phone).
+try {
+  var internalParam = new URLSearchParams(location.search).get('jm_internal');
+  if (internalParam === '1') localStorage.setItem(${JSON.stringify(INTERNAL_TRAFFIC_KEY)}, '1');
+  if (internalParam === '0') localStorage.removeItem(${JSON.stringify(INTERNAL_TRAFFIC_KEY)});
+  if (localStorage.getItem(${JSON.stringify(INTERNAL_TRAFFIC_KEY)}) === '1') {
+    window['ga-disable-' + ${JSON.stringify(GA_MEASUREMENT_ID)}] = true;
+  }
+} catch (e) {}
 var cleanUrl = location.href;
 try {
   var u = new URL(location.href);
-  ['token', 'code', 'key', 'email', 'password'].forEach(function (p) { u.searchParams.delete(p); });
+  ['token', 'code', 'key', 'email', 'password', 'jm_internal'].forEach(function (p) { u.searchParams.delete(p); });
   cleanUrl = u.toString();
 } catch (e) {}
 gtag('js', new Date());
@@ -156,6 +168,7 @@ export default function RootLayout({
         <div id="a11y-scope">{children}</div>
         <AccessibilityMenu />
         <CookieNotice />
+        {process.env.NODE_ENV === 'production' && <AnalyticsLinkTracker />}
         <Toaster position="top-center" richColors />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

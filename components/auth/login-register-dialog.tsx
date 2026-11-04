@@ -1,5 +1,6 @@
 "use client"
 
+import { trackEvent } from "@/lib/analytics"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -42,6 +43,7 @@ export function LoginRegisterDialog({
       body: JSON.stringify({ email, password }),
     })
     if (!res.ok) { setError((await res.json()).error ?? "שגיאה"); setLoading(false); return }
+    trackEvent("login", { method: "email" })
     const me = await fetch("/api/user/me")
     onSuccess(await me.json())
     onOpenChange(false); toast.success("ברוך הבא!"); setLoading(false)
@@ -57,6 +59,7 @@ export function LoginRegisterDialog({
       body: JSON.stringify({ email, password, name: name.trim(), phone: phone.trim() }),
     })
     if (!res.ok) { setError((await res.json()).error ?? "שגיאה"); setLoading(false); return }
+    trackEvent("sign_up", { method: "email" })
     const me = await fetch("/api/user/me")
     onSuccess(await me.json())
     onOpenChange(false); toast.success("החשבון נוצר בהצלחה!"); setLoading(false)

@@ -1,5 +1,6 @@
 "use client"
 
+import { trackEvent } from "@/lib/analytics"
 import { Card } from "@/components/ui/card"
 import { JobTags } from "@/components/job-board/job-tags"
 import { getCategoryIcon } from "@/lib/category-icons"
@@ -23,6 +24,7 @@ export function JobCard({
 
   function handleWhatsApp(e: React.MouseEvent) {
     e.stopPropagation()
+    trackEvent("whatsapp_click", { link_location: "job_card", job_id: job.id, job_title: job.title })
     const text = `היי, אני מעוניין/ת להגיש מועמדות למשרת ${job.title} באזור ${job.region} שפורסמה בג'וב מוש. אשמח לפרטים נוספים.`
     window.open(
       `https://wa.me/${job.whatsappNumber}?text=${encodeURIComponent(text)}`,
