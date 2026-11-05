@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { list, put, del } from "@vercel/blob"
 import { requireAdminPermission } from "@/lib/admin-auth"
 import { getSettings, SETTINGS_BLOB_PATH } from "@/lib/get-settings"
-import { normalizeSettings } from "@/lib/job-board-data"
+import { normalizeSettings, type GlobalSettings } from "@/lib/job-board-data"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -12,11 +12,11 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  // Settings and Nav tabs both write this object — either permission suffices.
-  const auth = (await requireAdminPermission("settings")).ok
-    ? { ok: true }
-    : await requireAdminPermission("nav")
-  if (!auth.ok) {
+  // Settings and Nav tabs both write this object; each field is gated by its
+  // own permission: nav* fields need "nav", everything else needs "settings".
+  const canSettings = (await requireAdminPermission("settings")).ok
+  const canNav = (await requireAdminPermission("nav")).ok
+  if (!canSettings && !canNav) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -30,7 +30,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Expected object" }, { status: 400 })
   }
 
-  const settings = normalizeSettings(body)
+  const incoming = normalizeSettings(body)
+  const current = await getSettings()
+  const settings: GlobalSettings = { ...current }
+  for (const key of Object.keys(incoming) as (keyof GlobalSettings)[]) {
+    const allowed = key.startsWith("nav") ? canNav : canSettings
+    if (allowed) (settings as Record<string, unknown>)[key] = incoming[key]
+  }
   try {
     const { blobs } = await list({ prefix: SETTINGS_BLOB_PATH })
     await Promise.all(blobs.map((b) => del(b.url)))
