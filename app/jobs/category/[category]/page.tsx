@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { JobListCard } from "@/components/landing/job-list-card"
 import { LandingShell, LinkChips } from "@/components/landing/landing-shell"
-import { getLiveCategories, getLiveJobs } from "@/lib/get-jobs"
+import { getLiveCategories, getPublicJobs } from "@/lib/get-jobs"
 import { getJobSlug } from "@/lib/job-board-data"
 import {
   MIN_JOBS_TO_INDEX,
@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic"
 type Params = { params: Promise<{ category: string }> }
 
 async function load(param: string) {
-  const [jobs, categories] = await Promise.all([getLiveJobs(), getLiveCategories()])
+  const [jobs, categories] = await Promise.all([getPublicJobs(), getLiveCategories()])
   const categoryPages = getCategoryPages(jobs, categories)
   const page = categoryPages.find((c) => c.slug === decodeSlug(param))
   return { page, categoryPages, categories, jobs }

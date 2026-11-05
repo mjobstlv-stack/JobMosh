@@ -2,7 +2,7 @@ import { NextResponse, after } from "next/server"
 import { list, put, del, get } from "@vercel/blob"
 import { requireAdminPermission } from "@/lib/admin-auth"
 import { INITIAL_JOBS, type Job } from "@/lib/job-board-data"
-import { getLiveJobs } from "@/lib/get-jobs"
+import { getLiveJobs, toPublicJob } from "@/lib/get-jobs"
 import { diffJobsForIndexing, notifyGoogle } from "@/lib/google-indexing"
 
 export const runtime = "nodejs"
@@ -11,15 +11,19 @@ export const dynamic = "force-dynamic"
 const BLOB_PATH = "config/jobs.json"
 
 export async function GET() {
+  let jobs: Job[] = INITIAL_JOBS
   try {
     const result = await get(BLOB_PATH, { access: "private" })
-    if (!result) return NextResponse.json(INITIAL_JOBS)
-    const text = await new Response(result.stream).text()
-    const data = JSON.parse(text)
-    return NextResponse.json(Array.isArray(data) ? data : INITIAL_JOBS)
+    if (result) {
+      const data = JSON.parse(await new Response(result.stream).text())
+      if (Array.isArray(data)) jobs = data
+    }
   } catch {
-    return NextResponse.json(INITIAL_JOBS)
+    // fall back to INITIAL_JOBS
   }
+  // Only admins with the jobs permission see private fields (notification email).
+  const isAdmin = (await requireAdminPermission("jobs")).ok
+  return NextResponse.json(isAdmin ? jobs : jobs.map(toPublicJob))
 }
 
 export async function POST(req: Request) {

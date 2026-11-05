@@ -92,7 +92,6 @@ export function ApplyFormContent({
     formData.append("jobId", job.id)
     formData.append("jobTitle", job.title)
     formData.append("jobCompany", job.company)
-    if (job.notificationEmail) formData.append("notificationEmail", job.notificationEmail)
     if (cvFile) formData.append("cv", cvFile)
     if (selectedProfileId) formData.append("profileId", selectedProfileId)
     if (selectedProfile?.cvPath && !cvFile) formData.append("useProfileCv", "true")
@@ -232,6 +231,8 @@ export function ApplyFormContent({
           />
           <FieldContent>
             <FieldLabel htmlFor="afc-consent" className="font-normal">
+              {/* single inline span — FieldLabel is flex, which split the sentence into columns */}
+              <span>
               אני מאשר/ת את{" "}
               <a href="/terms" target="_blank" className="underline hover:text-primary">
                 תנאי השירות
@@ -240,6 +241,7 @@ export function ApplyFormContent({
               <a href="/privacy" target="_blank" className="underline hover:text-primary">
                 מדיניות הפרטיות
               </a>
+              </span>
             </FieldLabel>
             {errors.consent && <FieldError>{errors.consent}</FieldError>}
           </FieldContent>

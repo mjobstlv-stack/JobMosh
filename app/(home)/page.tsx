@@ -1,5 +1,5 @@
 import { HomeClient } from "@/components/job-board/home-client"
-import { getLiveCategories, getLiveJobs } from "@/lib/get-jobs"
+import { getLiveCategories, getPublicJobs } from "@/lib/get-jobs"
 import { getSettings } from "@/lib/get-settings"
 
 export const runtime = "nodejs"
@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic"
 
 export default async function Page() {
   const [jobs, categories, settings] = await Promise.all([
-    getLiveJobs(),
+    getPublicJobs(),
     getLiveCategories(),
     getSettings(),
   ])

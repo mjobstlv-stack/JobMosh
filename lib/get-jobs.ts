@@ -20,6 +20,17 @@ export function getLiveJobs(): Promise<Job[]> {
   return readBlobArray(JOBS_BLOB_PATH, INITIAL_JOBS)
 }
 
+/** A job as it may be shown to visitors — private fields (notification email) removed. */
+export function toPublicJob(job: Job): Job {
+  const { notificationEmail: _private, ...rest } = job
+  return rest
+}
+
+/** Jobs safe to send to the browser on public pages. Use getLiveJobs only server-side. */
+export async function getPublicJobs(): Promise<Job[]> {
+  return (await getLiveJobs()).map(toPublicJob)
+}
+
 export function getLiveCategories(): Promise<Category[]> {
   return readBlobArray(CATEGORIES_BLOB_PATH, INITIAL_CATEGORIES)
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { getLiveCategories, getLiveJobs } from "@/lib/get-jobs"
+import { getLiveCategories, getPublicJobs } from "@/lib/get-jobs"
 import {
   formatHebrewDate,
   getJobSlug,
@@ -55,7 +55,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const jobs = await getLiveJobs()
+  const jobs = await getPublicJobs()
   const job: Job | undefined = jobs.find(
     (j) => (getJobSlug(j) === id || j.id === id) && j.status === "active"
   )
@@ -98,7 +98,7 @@ export default async function JobPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const jobs = await getLiveJobs()
+  const jobs = await getPublicJobs()
   const job: Job | undefined = jobs.find(
     (j) => (getJobSlug(j) === id || j.id === id) && j.status === "active"
   )

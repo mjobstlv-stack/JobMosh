@@ -5,16 +5,11 @@ import { get, put } from "@vercel/blob"
 import { cookies } from "next/headers"
 import { verifyUserSessionToken } from "@/lib/session"
 import { getUser, saveUser } from "@/lib/blob-user"
+import { getLiveJobs } from "@/lib/get-jobs"
+import { sanitizeFilename, validateCvFile } from "@/lib/cv-file"
 
 export const runtime = "nodejs"
 
-const MAX_FILE_BYTES = 5 * 1024 * 1024 // 5 MB
-const ALLOWED_MIME = new Set([
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-])
-const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{2,}$/
 
 // Simple in-memory rate limit: 5 submissions per IP per minute
 const rlMap = new Map<string, { count: number; resetAt: number }>()
@@ -38,14 +33,6 @@ function escHtml(s: string): string {
     .replace(/"/g, "&quot;")
 }
 
-function sanitizeFilename(name: string): string {
-  // Allow Hebrew letters, ASCII word chars, dots, hyphens; block path traversal
-  return name
-    .replace(/\.\./g, "_")
-    .replace(/[^\wא-ת.\-]/g, "_")
-    .slice(0, 100)
-}
-
 export async function POST(req: NextRequest) {
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
@@ -56,45 +43,44 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const form = await req.formData()
 
-    const name = (form.get("name") as string | null)?.trim() ?? ""
-    const phone = (form.get("phone") as string | null)?.trim() ?? ""
-    const message = (form.get("message") as string | null)?.trim() ?? ""
-    const jobId = (form.get("jobId") as string | null) ?? ""
-    const jobTitle = (form.get("jobTitle") as string | null) ?? ""
-    const jobCompany = (form.get("jobCompany") as string | null) ?? ""
-    const notificationEmail =
-      (form.get("notificationEmail") as string | null)?.trim() || null
-    const cvFile = form.get("cv") as File | null
+    const str = (key: string, max: number) => {
+      const v = form.get(key)
+      return typeof v === "string" ? v.trim().slice(0, max) : ""
+    }
+    const name = str("name", 100)
+    const phone = str("phone", 30)
+    const message = str("message", 2000)
+    const jobId = str("jobId", 200)
+    const cvEntry = form.get("cv")
+    const cvFile = cvEntry instanceof File && cvEntry.size > 0 ? cvEntry : null
 
     if (!name || !phone || !jobId) {
       return NextResponse.json({ error: "חסרים שדות חובה" }, { status: 400 })
     }
 
-    // Validate notification email format to prevent relay abuse
-    if (notificationEmail && !EMAIL_RE.test(notificationEmail)) {
-      return NextResponse.json({ error: "מייל לא תקין" }, { status: 400 })
+    // Job details and the recipient come from the server-side job record, never
+    // from the form — otherwise anyone could use this endpoint to send mail
+    // from our domain to arbitrary addresses.
+    const job = (await getLiveJobs()).find((j) => j.id === jobId && j.status === "active")
+    if (!job || !job.allowSiteApply) {
+      return NextResponse.json({ error: "המשרה לא נמצאה או שאינה פתוחה להגשה" }, { status: 404 })
+    }
+    const jobTitle = job.title
+    const jobCompany = job.company
+
+    let cvBytes: Buffer | null = null
+    let cvContentType = ""
+    if (cvFile) {
+      const check = await validateCvFile(cvFile)
+      if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 })
+      cvBytes = check.bytes
+      cvContentType = check.contentType
     }
 
-    if (cvFile && cvFile.size > MAX_FILE_BYTES) {
-      return NextResponse.json(
-        { error: "הקובץ גדול מדי — מקסימום 5MB" },
-        { status: 400 },
-      )
-    }
-
-    // Validate MIME type
-    if (cvFile && cvFile.size > 0 && !ALLOWED_MIME.has(cvFile.type)) {
-      return NextResponse.json(
-        { error: "סוג קובץ לא נתמך — יש להעלות PDF או Word בלבד" },
-        { status: 400 },
-      )
-    }
-
-    const recipient = notificationEmail ?? process.env.NOTIFICATION_EMAIL
+    const recipient = job.notificationEmail?.trim() || process.env.NOTIFICATION_EMAIL
 
     if (!recipient) {
       return NextResponse.json(
@@ -124,17 +110,17 @@ export async function POST(req: NextRequest) {
     let cvUrl: string | undefined
     let profileCvFileName: string | undefined
 
-    if (cvFile && cvFile.size > 0) {
-      const buffer = await cvFile.arrayBuffer()
+    if (cvFile && cvBytes) {
       attachments.push({
         filename: sanitizeFilename(cvFile.name),
-        content: Buffer.from(buffer),
+        content: cvBytes,
       })
 
       try {
         const safeName = sanitizeFilename(cvFile.name)
-        const blob = await put(`cv/${Date.now()}-${safeName}`, cvFile, {
+        const blob = await put(`cv/${Date.now()}-${safeName}`, cvBytes, {
           access: "private",
+          contentType: cvContentType,
         })
         cvUrl = blob.downloadUrl
       } catch (blobErr) {
@@ -143,7 +129,7 @@ export async function POST(req: NextRequest) {
     }
 
     // If no CV file uploaded, check if user wants to use their saved profile CV
-    if (!cvFile || cvFile.size === 0) {
+    if (!cvFile) {
       const useProfileCv = form.get("useProfileCv") === "true"
       const submittedProfileId = (() => {
         const v = form.get("profileId")
@@ -187,6 +173,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const resend = new Resend(process.env.RESEND_API_KEY)
     const { error: sendError } = await resend.emails.send({
       from,
       to: [recipient],

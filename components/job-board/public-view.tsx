@@ -533,6 +533,18 @@ export function PublicView({
                 )
               })}
             </div>
+
+            {/* Results are below the fold — after picking a region, offer a jump to them */}
+            {regions.length > 0 && (
+              <button
+                type="button"
+                onClick={() => jobsSectionRef.current?.scrollIntoView({ behavior: "smooth" })}
+                className="mx-auto mt-3 flex items-center gap-1.5 rounded-full bg-accent px-4 py-1.5 text-xs font-semibold text-accent-foreground shadow-sm transition-transform hover:scale-105"
+              >
+                הצגת המשרות באזור שנבחר
+                <span aria-hidden>↓</span>
+              </button>
+            )}
           </div>
 
           {/* Stats bar removed — numeric counts undermined credibility when inventory is small */}

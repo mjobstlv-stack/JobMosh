@@ -1,49 +1,59 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import type { Category, Job, GlobalSettings } from "@/lib/job-board-data"
+import { DEFAULT_SETTINGS, type Category, type Job, type GlobalSettings } from "@/lib/job-board-data"
 import { AdminView } from "@/components/job-board/admin-view"
 import { LoginGate, type AuthInfo } from "@/components/job-board/login-gate"
-import { ExternalLink, LogOut } from "lucide-react"
+import { ExternalLink, Loader2, LogOut } from "lucide-react"
 import type { AdminPermission } from "@/lib/admin-staff"
+import { toast } from "sonner"
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.jobmosh.co.il"
 
-function postJson(url: string, body: unknown) {
-  return fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(body),
-  }).catch(console.error)
+/** Persists a change; tells the admin when it did NOT save (e.g. expired session). */
+async function postJson(url: string, body: unknown) {
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(body),
+    })
+    if (res.status === 401) {
+      toast.error("פג תוקף ההתחברות — השינוי לא נשמר. יש להתחבר מחדש.")
+    } else if (!res.ok) {
+      toast.error("השמירה נכשלה — השינוי לא נשמר בשרת.")
+    }
+  } catch {
+    toast.error("אין חיבור לשרת — השינוי לא נשמר.")
+  }
 }
 
-/** The admin panel shell, served only on ADMIN_HOST (see proxy.ts). */
-export function AdminClient({
-  initialJobs,
-  initialCategories,
-  initialSettings,
-}: {
-  initialJobs: Job[]
-  initialCategories: Category[]
-  initialSettings: GlobalSettings
-}) {
+/**
+ * The admin panel shell, served only on ADMIN_HOST (see proxy.ts).
+ * Data is fetched only after login — the jobs API returns private fields
+ * (notification email) only to an authenticated admin, and the editor must
+ * never save a list that was loaded without them.
+ */
+export function AdminClient() {
   const [authKey, setAuthKey] = useState(0)
   const [adminPermissions, setAdminPermissions] = useState<AdminPermission[] | null>(null)
-  const [jobs, setJobsState] = useState<Job[]>(initialJobs)
-  const [categories, setCategoriesState] = useState<Category[]>(initialCategories)
-  const [settings, setSettingsState] = useState<GlobalSettings>(initialSettings)
+  const [loaded, setLoaded] = useState(false)
+  const [loadError, setLoadError] = useState(false)
+  const [jobs, setJobsState] = useState<Job[]>([])
+  const [categories, setCategoriesState] = useState<Category[]>([])
+  const [settings, setSettingsState] = useState<GlobalSettings>(DEFAULT_SETTINGS)
 
-  const refreshData = useCallback(async () => {
+  const refreshData = useCallback(async (): Promise<boolean> => {
     const [jobsRes, catsRes, settingsRes] = await Promise.all([
       fetch("/api/jobs").catch(() => null),
       fetch("/api/categories").catch(() => null),
       fetch("/api/settings").catch(() => null),
     ])
-    if (jobsRes?.ok) {
-      const data = await jobsRes.json().catch(() => null)
-      if (Array.isArray(data) && data.length > 0) setJobsState(data)
-    }
+    if (!jobsRes?.ok) return false
+    const jobsData = await jobsRes.json().catch(() => null)
+    if (!Array.isArray(jobsData)) return false
+    setJobsState(jobsData)
     if (catsRes?.ok) {
       const data = await catsRes.json().catch(() => null)
       if (Array.isArray(data) && data.length > 0) setCategoriesState(data)
@@ -52,9 +62,8 @@ export function AdminClient({
       const data = await settingsRes.json().catch(() => null)
       if (data && typeof data === "object") setSettingsState(data)
     }
+    return true
   }, [])
-
-  useEffect(() => { refreshData() }, [refreshData])
 
   // Wrapped setters: update state AND persist to Blob immediately
   const setJobs = useCallback<React.Dispatch<React.SetStateAction<Job[]>>>((action) => {
@@ -90,11 +99,15 @@ export function AdminClient({
 
   function handleAuth(info: AuthInfo) {
     setAdminPermissions(info.permissions)
+    setLoadError(false)
+    refreshData().then((ok) => (ok ? setLoaded(true) : setLoadError(true)))
   }
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
     setAdminPermissions(null)
+    setLoaded(false)
+    setJobsState([])
     setAuthKey((k) => k + 1) // remount LoginGate → shows the login form again
   }
 
@@ -121,6 +134,30 @@ export function AdminClient({
               התנתקות
             </button>
           </div>
+          {!loaded ? (
+            <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-muted-foreground">
+              {loadError ? (
+                <>
+                  <p>טעינת הנתונים נכשלה.</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoadError(false)
+                      refreshData().then((ok) => (ok ? setLoaded(true) : setLoadError(true)))
+                    }}
+                    className="rounded-full border border-border px-4 py-1.5 text-sm hover:text-foreground"
+                  >
+                    נסה שוב
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Loader2 className="size-6 animate-spin" />
+                  <p className="text-sm">טוען נתונים…</p>
+                </>
+              )}
+            </div>
+          ) : (
           <AdminView
             jobs={jobs}
             setJobs={setJobs}
@@ -129,8 +166,9 @@ export function AdminClient({
             settings={settings}
             setSettings={setSettings}
             permissions={adminPermissions}
-            onRefresh={refreshData}
+            onRefresh={async () => { await refreshData() }}
           />
+          )}
         </div>
       </LoginGate>
     </div>

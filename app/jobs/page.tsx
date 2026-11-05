@@ -3,7 +3,7 @@ import Link from "next/link"
 import { MapPin } from "lucide-react"
 import { LandingShell } from "@/components/landing/landing-shell"
 import { getCategoryIcon } from "@/lib/category-icons"
-import { getLiveCategories, getLiveJobs } from "@/lib/get-jobs"
+import { getLiveCategories, getPublicJobs } from "@/lib/get-jobs"
 import {
   categoryUrl,
   cityUrl,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 }
 
 export default async function JobsHubPage() {
-  const [jobs, categories] = await Promise.all([getLiveJobs(), getLiveCategories()])
+  const [jobs, categories] = await Promise.all([getPublicJobs(), getLiveCategories()])
   const total = getActiveJobs(jobs).length
   const cities = getCityPages(jobs)
   const categoryPages = getCategoryPages(jobs, categories)
