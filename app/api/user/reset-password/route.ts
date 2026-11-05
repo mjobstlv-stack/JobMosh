@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
+import { clientIp, rateLimit } from "@/lib/rate-limit"
 import bcrypt from "bcryptjs"
 import { getResetToken, deleteResetToken, getUser, saveUser } from "@/lib/blob-user"
 
 export const runtime = "nodejs"
 
-const rlMap = new Map<string, { count: number; resetAt: number }>()
-function checkRL(ip: string): boolean {
-  const now = Date.now()
-  const e = rlMap.get(ip)
-  if (!e || now > e.resetAt) { rlMap.set(ip, { count: 1, resetAt: now + 60_000 }); return true }
-  if (e.count >= 5) return false
-  e.count++; return true
-}
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-  if (!checkRL(ip)) return NextResponse.json({ ok: true }) // silently rate-limit
+  const ip = clientIp(req)
+  if (!(await rateLimit("reset", ip, 5, 60))) return NextResponse.json({ ok: true }) // silently rate-limit
 
   let body: { token?: unknown; newPassword?: unknown }
   try { body = await req.json() } catch {

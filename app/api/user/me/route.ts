@@ -15,10 +15,12 @@ async function getUserId(): Promise<string | null> {
 
 export async function GET() {
   try {
+    // "Not logged in" is a normal state for visitors, not an error — answer
+    // 200 null so every page view doesn't log a failed request in the console.
     const userId = await getUserId()
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    if (!userId) return NextResponse.json(null)
     const user = await getUser(userId)
-    if (!user) return NextResponse.json({ error: "Not found" }, { status: 404 })
+    if (!user) return NextResponse.json(null)
     // Backward compat for users created before name/phone/applications were added
     if (!user.name) user.name = (user.profiles[0] as { name?: string } | undefined)?.name ?? ""
     if (!user.phone) user.phone = (user.profiles[0] as { phone?: string } | undefined)?.phone ?? ""

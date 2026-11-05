@@ -72,6 +72,7 @@ export function CookieNotice() {
 
   return (
     <div
+      data-cookie-notice
       className="fixed bottom-5 right-4 z-50 w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-border bg-card p-4 shadow-2xl"
       dir="rtl"
       role="dialog"

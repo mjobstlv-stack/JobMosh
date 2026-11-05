@@ -357,6 +357,42 @@ export default async function JobPage({
             </div>
           </div>
         </main>
+
+        {/* Mobile: the apply box sits below the whole description — keep the
+            main actions reachable at the bottom of the screen. */}
+        {(job.allowSiteApply || job.allowWhatsApp) && (
+          <>
+            <div className="h-24 lg:hidden" aria-hidden />
+            <div data-sticky-cta className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] backdrop-blur-sm lg:hidden">
+              <div className="mx-auto flex max-w-5xl items-center gap-2">
+                {job.allowSiteApply && (
+                  <div className="flex-1">
+                    <ApplyButton job={job} />
+                  </div>
+                )}
+                {job.allowWhatsApp && (
+                  <a
+                    data-track-location="job_page_sticky"
+                    data-job-id={job.id}
+                    data-job-title={job.title}
+                    href={`https://wa.me/${job.whatsappNumber}?text=${encodeURIComponent(whatsappText)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="הגשה מהירה בוואטסאפ"
+                    className={
+                      job.allowSiteApply
+                        ? "flex size-11 shrink-0 items-center justify-center rounded-xl border border-green-200 bg-green-50 text-green-700"
+                        : "flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-green-200 bg-green-50 text-sm font-semibold text-green-700"
+                    }
+                  >
+                    <MessageCircle className="size-5" />
+                    {!job.allowSiteApply && "הגשה מהירה בוואטסאפ"}
+                  </a>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   )

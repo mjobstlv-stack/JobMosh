@@ -72,11 +72,7 @@ export function LoginRegisterDialog({
       body: JSON.stringify({ email }),
     })
     if (!res.ok) {
-      if (res.status === 404) {
-        setError("כתובת המייל אינה רשומה במערכת")
-      } else {
-        setError("שגיאה בשליחת המייל — נסה שנית מאוחר יותר")
-      }
+      setError("שגיאה בשליחת המייל — נסה שנית מאוחר יותר")
       setLoading(false); return
     }
     setForgotSent(true); setLoading(false)
@@ -155,7 +151,7 @@ export function LoginRegisterDialog({
         {tab === "forgot" && (
           forgotSent ? (
             <div className="space-y-4 py-2 text-center">
-              <p className="text-foreground">שלחנו קישור לאיפוס הסיסמה לכתובת {email}</p>
+              <p className="text-foreground">אם הכתובת {email} רשומה באתר, נשלח אליה קישור לאיפוס הסיסמה. כדאי לבדוק גם בתיקיית הספאם.</p>
               <Button variant="outline" onClick={() => switchTab("login")}>חזרה לכניסה</Button>
             </div>
           ) : (

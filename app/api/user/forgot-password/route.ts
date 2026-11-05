@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/lib/site"
+import { clientIp, rateLimit } from "@/lib/rate-limit"
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { randomBytes } from "node:crypto"
@@ -6,26 +7,20 @@ import { getUserByEmail, saveResetToken } from "@/lib/blob-user"
 
 export const runtime = "nodejs"
 
-const rlMap = new Map<string, { count: number; resetAt: number }>()
-function checkRL(ip: string): boolean {
-  const now = Date.now()
-  const e = rlMap.get(ip)
-  if (!e || now > e.resetAt) { rlMap.set(ip, { count: 1, resetAt: now + 60_000 }); return true }
-  if (e.count >= 5) return false
-  e.count++; return true
-}
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-  if (!checkRL(ip)) return NextResponse.json({ ok: true }) // silently rate-limit
+  const ip = clientIp(req)
+  if (!(await rateLimit("forgot", ip, 5, 60))) return NextResponse.json({ ok: true }) // silently rate-limit
 
   let body: { email?: unknown }
   try { body = await req.json() } catch { return NextResponse.json({ ok: true }) }
   const { email } = body
   if (!email || typeof email !== "string") return NextResponse.json({ ok: true })
 
+  // Same response whether or not the address is registered — don't reveal
+  // which emails have accounts.
   const user = await getUserByEmail(email)
-  if (!user) return NextResponse.json({ error: "email_not_found" }, { status: 404 })
+  if (!user) return NextResponse.json({ ok: true })
 
   const token = randomBytes(32).toString("hex")
   await saveResetToken(token, user.id)
@@ -34,7 +29,7 @@ export async function POST(req: NextRequest) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   const { error: sendError } = await resend.emails.send({
     from: process.env.RESEND_FROM ?? "onboarding@resend.dev",
-    to: [email],
+    to: [user.email],
     subject: "איפוס סיסמה — ג'וב מוש",
     html: `
       <div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;">

@@ -747,9 +747,9 @@ export function PublicView({
           ))}
         </div>
         <div className="flex flex-wrap items-center justify-center gap-5 text-xs text-muted-foreground/50">
-          <a href="/jobs" className="transition-colors hover:text-muted-foreground">
+          <Link href="/jobs" className="transition-colors hover:text-muted-foreground">
             משרות לפי עיר ותחום
-          </a>
+          </Link>
           <a href="/about" className="transition-colors hover:text-muted-foreground">
             אודות
           </a>

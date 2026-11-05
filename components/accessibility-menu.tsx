@@ -146,7 +146,7 @@ export function AccessibilityMenu() {
   ]
 
   return (
-    <div className="fixed bottom-5 left-4 z-50" dir="rtl">
+    <div className="fixed bottom-5 left-4 z-50 max-lg:[body:has([data-sticky-cta])_&]:bottom-24" dir="rtl">
       {/* Panel */}
       {open && (
         <div className="mb-3 w-72 overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">

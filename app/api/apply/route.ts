@@ -1,4 +1,5 @@
 import { SITE_URL } from "@/lib/site"
+import { clientIp, rateLimit } from "@/lib/rate-limit"
 import { NextRequest, NextResponse } from "next/server"
 import { Resend } from "resend"
 import { get, put } from "@vercel/blob"
@@ -11,19 +12,6 @@ import { sanitizeFilename, validateCvFile } from "@/lib/cv-file"
 export const runtime = "nodejs"
 
 
-// Simple in-memory rate limit: 5 submissions per IP per minute
-const rlMap = new Map<string, { count: number; resetAt: number }>()
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rlMap.get(ip)
-  if (!entry || now > entry.resetAt) {
-    rlMap.set(ip, { count: 1, resetAt: now + 60_000 })
-    return true
-  }
-  if (entry.count >= 5) return false
-  entry.count++
-  return true
-}
 
 function escHtml(s: string): string {
   return s
@@ -34,9 +22,8 @@ function escHtml(s: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-  if (!checkRateLimit(ip)) {
+  const ip = clientIp(req)
+  if (!(await rateLimit("apply", ip, 5, 60))) {
     return NextResponse.json(
       { error: "יותר מדי בקשות — נסה שוב בעוד דקה" },
       { status: 429 },

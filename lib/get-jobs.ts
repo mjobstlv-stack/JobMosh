@@ -26,9 +26,14 @@ export function toPublicJob(job: Job): Job {
   return rest
 }
 
+/** Only what visitors may see: active jobs, without private fields. */
+export function toPublicJobs(jobs: Job[]): Job[] {
+  return jobs.filter((j) => j.status === "active").map(toPublicJob)
+}
+
 /** Jobs safe to send to the browser on public pages. Use getLiveJobs only server-side. */
 export async function getPublicJobs(): Promise<Job[]> {
-  return (await getLiveJobs()).map(toPublicJob)
+  return toPublicJobs(await getLiveJobs())
 }
 
 export function getLiveCategories(): Promise<Category[]> {

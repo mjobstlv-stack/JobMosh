@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { clientIp, rateLimit } from "@/lib/rate-limit"
 import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
 import { getUserByEmail, saveUser, createEmailLookup } from "@/lib/blob-user"
@@ -7,19 +8,10 @@ import { createUserSessionToken } from "@/lib/session"
 export const runtime = "nodejs"
 
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{2,}$/
-const rlMap = new Map<string, { count: number; resetAt: number }>()
-
-function checkRL(ip: string): boolean {
-  const now = Date.now()
-  const e = rlMap.get(ip)
-  if (!e || now > e.resetAt) { rlMap.set(ip, { count: 1, resetAt: now + 60_000 }); return true }
-  if (e.count >= 5) return false
-  e.count++; return true
-}
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-  if (!checkRL(ip)) return NextResponse.json({ error: "יותר מדי בקשות" }, { status: 429 })
+  const ip = clientIp(req)
+  if (!(await rateLimit("register", ip, 5, 60))) return NextResponse.json({ error: "יותר מדי בקשות" }, { status: 429 })
 
   let body: unknown
   try { body = await req.json() } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }) }

@@ -113,6 +113,8 @@ export function AdminClient() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Staff-only tool: no visitor cookie banner here */}
+      <style>{"[data-cookie-notice]{display:none!important}"}</style>
       <LoginGate key={authKey} onAuth={handleAuth}>
         <div className="relative">
           <div className="fixed end-4 top-4 z-50 flex items-center gap-2">

@@ -2,7 +2,7 @@ import { NextResponse, after } from "next/server"
 import { list, put, del, get } from "@vercel/blob"
 import { requireAdminPermission } from "@/lib/admin-auth"
 import { INITIAL_JOBS, type Job } from "@/lib/job-board-data"
-import { getLiveJobs, toPublicJob } from "@/lib/get-jobs"
+import { getLiveJobs, toPublicJobs } from "@/lib/get-jobs"
 import { diffJobsForIndexing, notifyGoogle } from "@/lib/google-indexing"
 
 export const runtime = "nodejs"
@@ -21,9 +21,9 @@ export async function GET() {
   } catch {
     // fall back to INITIAL_JOBS
   }
-  // Only admins with the jobs permission see private fields (notification email).
+  // Only admins with the jobs permission see non-active jobs and private fields.
   const isAdmin = (await requireAdminPermission("jobs")).ok
-  return NextResponse.json(isAdmin ? jobs : jobs.map(toPublicJob))
+  return NextResponse.json(isAdmin ? jobs : toPublicJobs(jobs))
 }
 
 export async function POST(req: Request) {

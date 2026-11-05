@@ -53,6 +53,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "הסיסמה חייבת להכיל לפחות 8 תווים" }, { status: 400 })
   }
 
+  if ((await listAllStaff()).some((s) => s.email === email)) {
+    return NextResponse.json({ error: "כבר קיים איש צוות עם כתובת המייל הזו" }, { status: 409 })
+  }
+
   const id = `s${Date.now().toString(36)}`
   await saveStaff({
     id,
@@ -87,7 +91,14 @@ export async function PUT(req: Request) {
 
   const updated = { ...existing }
   if (body.name !== undefined) updated.name = String(body.name).trim()
-  if (body.email !== undefined) updated.email = String(body.email).trim().toLowerCase()
+  if (body.email !== undefined) {
+    const email = String(body.email).trim().toLowerCase()
+    if (!email) return NextResponse.json({ error: "אימייל הוא שדה חובה" }, { status: 400 })
+    if ((await listAllStaff()).some((s) => s.id !== id && s.email === email)) {
+      return NextResponse.json({ error: "כבר קיים איש צוות עם כתובת המייל הזו" }, { status: 409 })
+    }
+    updated.email = email
+  }
   if (body.active !== undefined) updated.active = Boolean(body.active)
   if (body.permissions !== undefined) {
     updated.permissions = (body.permissions)
