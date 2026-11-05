@@ -55,13 +55,11 @@ export function PublicView({
   categories,
   settings,
   onSubmitApplication,
-  onSwitchToAdmin,
 }: {
   jobs: Job[]
   categories: Category[]
   settings: GlobalSettings
   onSubmitApplication: (app: Application) => void
-  onSwitchToAdmin: () => void
 }) {
   const [query, setQuery] = useState("")
   const [regions, setRegions] = useState<string[]>([])
@@ -753,13 +751,6 @@ export function PublicView({
             נגישות
           </a>
           <CookieSettingsLink className="transition-colors hover:text-muted-foreground" />
-          <button
-            onClick={onSwitchToAdmin}
-            className="text-muted-foreground/30 hover:text-muted-foreground/70 transition-colors select-none text-base leading-none"
-            aria-label="כניסה למנהל"
-          >
-            ⚙
-          </button>
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground/30">© {new Date().getFullYear()} ג&apos;וב מוש. כל הזכויות שמורות.</p>
       </footer>

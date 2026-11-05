@@ -195,6 +195,29 @@ export type GlobalSettings = {
   navCareersLabel: string
 }
 
+export const DEFAULT_SETTINGS: GlobalSettings = {
+  jobAlertsEnabled: true,
+  navJobsVisible: true,
+  navJobsLabel: "משרות",
+  navCompaniesVisible: false,
+  navCompaniesLabel: "חברות",
+  navCareersVisible: false,
+  navCareersLabel: "ייעוץ קריירה",
+}
+
+/** Keeps only known GlobalSettings keys with the right types; fills the rest from defaults. */
+export function normalizeSettings(input: unknown): GlobalSettings {
+  const src = (input && typeof input === "object" ? input : {}) as Record<string, unknown>
+  const out = { ...DEFAULT_SETTINGS }
+  for (const key of Object.keys(DEFAULT_SETTINGS) as (keyof GlobalSettings)[]) {
+    const value = src[key]
+    if (typeof value === typeof DEFAULT_SETTINGS[key]) {
+      ;(out as Record<string, unknown>)[key] = typeof value === "string" ? value.slice(0, 60) : value
+    }
+  }
+  return out
+}
+
 // The set of icons the admin can pick from when creating a category.
 export const ICON_OPTIONS = [
   "code",

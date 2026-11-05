@@ -1,5 +1,6 @@
 import { HomeClient } from "@/components/job-board/home-client"
 import { getLiveCategories, getLiveJobs } from "@/lib/get-jobs"
+import { getSettings } from "@/lib/get-settings"
 
 export const runtime = "nodejs"
 // Server-render the live listings on every request so crawlers (and first paint)
@@ -7,6 +8,10 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export default async function Page() {
-  const [jobs, categories] = await Promise.all([getLiveJobs(), getLiveCategories()])
-  return <HomeClient initialJobs={jobs} initialCategories={categories} />
+  const [jobs, categories, settings] = await Promise.all([
+    getLiveJobs(),
+    getLiveCategories(),
+    getSettings(),
+  ])
+  return <HomeClient initialJobs={jobs} initialCategories={categories} initialSettings={settings} />
 }
