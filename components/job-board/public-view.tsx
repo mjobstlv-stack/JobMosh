@@ -437,13 +437,13 @@ export function PublicView({
               <span className="inline-block whitespace-nowrap">ה<span className="relative inline-block">
                 <span className="hero-word-pop-sparkle text-amber-400 inline-block" style={{ animationDelay: "0.52s" }}>מוש</span>לם
                 {/* sparkle particles */}
-                <span aria-hidden="true" className="sparkle-dot text-[13px]" style={{ top: "-13px", right: "4px",  animationDelay: "0.8s"  }}>✦</span>
-                <span aria-hidden="true" className="sparkle-dot text-[8px]"  style={{ top: "-8px",  right: "-10px", animationDelay: "1.3s"  }}>✧</span>
-                <span aria-hidden="true" className="sparkle-dot text-[10px]" style={{ top: "-6px",  left: "-12px",  animationDelay: "1.9s"  }}>✦</span>
-                <span aria-hidden="true" className="sparkle-dot text-[7px]"  style={{ top: "30%",   right: "-13px", animationDelay: "0.5s"  }}>⋆</span>
-                <span aria-hidden="true" className="sparkle-dot text-[9px]"  style={{ bottom: "-8px", right: "8px", animationDelay: "2.1s"  }}>✦</span>
-                <span aria-hidden="true" className="sparkle-dot text-[7px]"  style={{ bottom: "-5px", left: "2px",  animationDelay: "1.6s"  }}>✧</span>
-                <span aria-hidden="true" className="sparkle-dot text-[11px]" style={{ bottom: "20%", left: "-14px", animationDelay: "2.6s"  }}>✦</span>
+                <span aria-hidden="true" data-glyph="✦" className="sparkle-dot text-[13px]" style={{ top: "-13px", right: "4px",  animationDelay: "0.8s"  }} />
+                <span aria-hidden="true" data-glyph="✧" className="sparkle-dot text-[8px]"  style={{ top: "-8px",  right: "-10px", animationDelay: "1.3s"  }} />
+                <span aria-hidden="true" data-glyph="✦" className="sparkle-dot text-[10px]" style={{ top: "-6px",  left: "-12px",  animationDelay: "1.9s"  }} />
+                <span aria-hidden="true" data-glyph="⋆" className="sparkle-dot text-[7px]"  style={{ top: "30%",   right: "-13px", animationDelay: "0.5s"  }} />
+                <span aria-hidden="true" data-glyph="✦" className="sparkle-dot text-[9px]"  style={{ bottom: "-8px", right: "8px", animationDelay: "2.1s"  }} />
+                <span aria-hidden="true" data-glyph="✧" className="sparkle-dot text-[7px]"  style={{ bottom: "-5px", left: "2px",  animationDelay: "1.6s"  }} />
+                <span aria-hidden="true" data-glyph="✦" className="sparkle-dot text-[11px]" style={{ bottom: "20%", left: "-14px", animationDelay: "2.6s"  }} />
               </span></span>{" "}שלכם
             </span>
             <br className="hidden sm:block" />{" "}

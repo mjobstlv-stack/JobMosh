@@ -125,6 +125,7 @@ const jsonLdWebSite = {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
       name: "ג'וב מוש",
+      alternateName: "JobMosh",
       url: SITE_URL,
       inLanguage: "he-IL",
       potentialAction: {
@@ -140,8 +141,15 @@ const jsonLdWebSite = {
       "@type": "Organization",
       "@id": `${SITE_URL}/#organization`,
       name: "ג'וב מוש",
+      alternateName: ["JobMosh", "Mjobs"],
       url: SITE_URL,
       logo: `${SITE_URL}/logo.png`,
+      // Same brand on social — helps Google tie the site and the profiles into one entity.
+      sameAs: [
+        "https://www.facebook.com/MjobsTlv",
+        "https://www.instagram.com/mjobstlv",
+        "https://t.me/mjobsisrael",
+      ],
       areaServed: "IL",
       address: {
         "@type": "PostalAddress",

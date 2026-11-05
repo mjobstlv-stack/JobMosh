@@ -44,6 +44,9 @@ const EMPLOYMENT_TYPE: Record<string, string> = {
 // applicantLocationRequirements alongside it. Hybrid jobs are listed by their office location.
 const isRemote = (job: Job) => job.workModel === "מהבית"
 
+/** Admin-typed titles sometimes carry double spaces; clean them for Google and the tab title. */
+const cleanTitle = (title: string) => title.replace(/\s+/g, " ").trim()
+
 // ── Next.js route exports ───────────────────────────────────────────────────
 
 export async function generateMetadata({
@@ -60,8 +63,8 @@ export async function generateMetadata({
   if (!job) notFound()
 
   // The root layout's title template already appends "| ג'וב מוש".
-  const title = `${job.title} · ${job.company} · ${job.city}`
-  const description = `${job.title} ב${job.company}, ${job.city}. ${toPreview(job.description, 140).slice(0, 140)}...`
+  const title = `${cleanTitle(job.title)} · ${job.company} · ${job.city}`
+  const description = `${cleanTitle(job.title)} ב${job.company}, ${job.city}. ${toPreview(job.description, 140).slice(0, 140)}...`
   const url = `${SITE_URL}/jobs/${getJobSlug(job)}`
 
   return {
@@ -111,7 +114,7 @@ export default async function JobPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
-    title: job.title,
+    title: cleanTitle(job.title),
     description: toJobPostingHtml(job.description, job.requirements),
     datePosted: job.postedAt,
     // No validThrough: jobs stay open until the admin archives them (archived jobs 404,
